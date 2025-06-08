@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POTUS - The Presidential Decision Simulation | Early Access</title>
+    <meta name="description" content="Step into the Oval Office. Make real-time decisions through voice calls with AI advisors. Every choice shapes history. Join 500 early access players.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="attached_assets/potus_favicon.png">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="POTUS - Command the Free World">
+    <meta property="og:description" content="The weight of the presidency, in your hands. Make the calls that shape history.">
+    <meta property="og:image" content="attached_assets/potus_open_graph.jpg">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="POTUS - Command the Free World">
+    <meta name="twitter:description" content="Every decision echoes through history.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0D1117;
+            --gold: #CD9218;
+            --text-light: #F0F0F0;
+            --form-bg: #1A1F2E;
+            --font-hero: 'Cormorant Garamond', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('attached_assets/white_house_background1.png');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.3) blur(2px);
+            z-index: -1;
+        }
+
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(13,17,23,0.4) 0%, rgba(13,17,23,0.8) 100%);
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+            margin-top: 180px;
+        }
+
+        .hero-title {
+            font-family: var(--font-hero);
+            font-size: 72px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            margin-bottom: 48px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .cta-button {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 18px 48px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button:hover {
+            background: var(--gold);
+            color: var(--bg-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(205, 146, 24, 0.3);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 120px 0;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #0a0e13 100%);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 48px;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 48px 32px;
+            background: rgba(26, 31, 46, 0.3);
+            border: 1px solid rgba(205, 146, 24, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(205, 146, 24, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 24px;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-hero);
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: var(--gold);
+        }
+
+        .feature-card p {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        /* Stakes Section */
+        .stakes {
+            padding: 120px 0;
+            background: var(--bg-dark);
+        }
+
+        .stakes-content {
+            text-align: center;
+        }
+
+        .stake-line {
+            font-family: var(--font-hero);
+            font-size: 36px;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .stake-line:nth-child(1) { animation-delay: 0.2s; }
+        .stake-line:nth-child(2) { animation-delay: 0.4s; }
+        .stake-line:nth-child(3) { animation-delay: 0.6s; }
+
+        /* Signup Section */
+        .signup {
+            padding: 120px 0;
+            background: linear-gradient(180deg, #0a0e13 0%, var(--bg-dark) 100%);
+        }
+
+        .signup-box {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 64px 48px;
+            background: rgba(26, 31, 46, 0.5);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+        }
+
+        .signup-box h2 {
+            font-family: var(--font-hero);
+            font-size: 32px;
+            margin-bottom: 24px;
+        }
+
+        .signup-counter {
+            font-size: 18px;
+            margin-bottom: 48px;
+            color: var(--gold);
+        }
+
+        #signupCount {
+            font-weight: 600;
+            font-size: 24px;
+        }
+
+        #signupForm {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        #email {
+            background: var(--form-bg);
+            border: 2px solid transparent;
+            color: var(--text-light);
+            padding: 18px 24px;
+            font-size: 18px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        #email:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        #email::placeholder {
+            color: rgba(240, 240, 240, 0.5);
+        }
+
+        .submit-button {
+            background: var(--gold);
+            border: none;
+            color: var(--bg-dark);
+            padding: 18px 48px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(205, 146, 24, 0.3);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .privacy-notice {
+            margin-top: 24px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* Confirmation Screen */
+        .confirmation {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 0;
+        }
+
+        .confirmation-content {
+            text-align: center;
+        }
+
+        .seal-animation {
+            font-size: 96px;
+            margin-bottom: 32px;
+            animation: fadeInScale 0.6s ease-out;
+        }
+
+        .confirmation h2 {
+            font-family: var(--font-hero);
+            font-size: 48px;
+            color: var(--gold);
+            margin-bottom: 24px;
+            letter-spacing: 4px;
+        }
+
+        .confirmation-message {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .confirmation-submessage {
+            font-size: 18px;
+            opacity: 0.8;
+            margin-bottom: 48px;
+        }
+
+        .share-section {
+            margin-top: 48px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 24px 0;
+            flex-wrap: wrap;
+        }
+
+        .share-buttons button {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .share-buttons button:hover {
+            background: var(--gold);
+            color: var(--bg-dark);
+        }
+
+        .share-tagline {
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 48px 0;
+            background: var(--bg-dark);
+            text-align: center;
+            border-top: 1px solid rgba(205, 146, 24, 0.1);
+        }
+
+        /* Mobile Sticky CTA */
+        .mobile-sticky-cta {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--gold);
+            border: none;
+            color: var(--bg-dark);
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 8px 32px rgba(205, 146, 24, 0.3);
+        }
+
+        /* Scroll Hint Arrow */
+        .scroll-hint {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .scroll-arrow {
+            width: 20px;
+            height: 20px;
+            position: relative;
+        }
+
+        .scroll-arrow::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 1px;
+            background: var(--gold);
+            top: 50%;
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: right;
+        }
+
+        .scroll-arrow::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 1px;
+            background: var(--gold);
+            top: 50%;
+            right: 0;
+            transform: rotate(-45deg);
+            transform-origin: left;
+        }
+
+        /* POTUS Seal */
+        .potus-seal {
+            position: absolute;
+            top: 8vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 150px;
+            opacity: 0.95;
+            z-index: 10;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .potus-seal {
+                top: 12vh;
+                width: 120px;
+                height: 120px;
+            }
+            
+            .hero-content {
+                margin-top: 80px;
+            }
+
+            .hero-title {
+                font-size: 48px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+
+            .cta-button {
+                padding: 16px 32px;
+                font-size: 16px;
+            }
+
+            .features {
+                padding: 80px 0;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .feature-card {
+                padding: 32px 24px;
+            }
+
+            .stakes {
+                padding: 80px 0;
+            }
+
+            .stake-line {
+                font-size: 24px;
+            }
+
+            .signup {
+                padding: 80px 0;
+            }
+
+            .signup-box {
+                padding: 48px 32px;
+                margin: 0 20px;
+            }
+
+            .signup-box h2 {
+                font-size: 24px;
+            }
+
+            .confirmation h2 {
+                font-size: 36px;
+            }
+
+            .mobile-sticky-cta {
+                display: block;
+            }
+
+            .share-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .share-buttons button {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .feature-icon {
+                font-size: 36px;
+            }
+
+            .stake-line {
+                font-size: 20px;
+            }
+
+            .seal-animation {
+                font-size: 72px;
+            }
+        }
+
+        /* Error States */
+        .error-message {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 8px;
+            text-align: left;
+        }
+
+        .input-error {
+            border-color: #ff6b6b !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <img src="attached_assets/potus_seal.PNG" alt="POTUS Seal" class="potus-seal">
+        <div class="hero-content">
+            <h1 class="hero-title">WANT TO BE THE PRESIDENT?</h1>
+            <p class="hero-subtitle">A real-time political simulation. Make the calls. Face the consequences.</p>
+            <button class="cta-button" onclick="scrollToSignup()">GET EARLY ACCESS</button>
+        </div>
+        <div class="scroll-hint">
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎙️</div>
+                    <h3>Real Voice Calls</h3>
+                    <p>Talk to AI advisors like the CIA Director, Joint Chiefs, and SecState.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏱️</div>
+                    <h3>Real-Time Decisions</h3>
+                    <p>Time passes with or without you. Every second counts.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Dynamic Scenarios</h3>
+                    <p>Crises evolve based on your strategy, alliances, and guts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stakes Section -->
+    <section class="stakes">
+        <div class="container">
+            <div class="stakes-content">
+                <p class="stake-line">Will you stop the war, or escalate it?</p>
+                <p class="stake-line">Will your Cabinet support you — or resign on live TV?</p>
+                <p class="stake-line">Will history call you a savior, or a tyrant?</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Signup Section -->
+    <section class="signup" id="signup">
+        <div class="container">
+            <div class="signup-box">
+                <h2>Join the first 500 to get exclusive early access.</h2>
+                <div class="signup-counter">
+                    <span id="signupCount">247</span> future presidents have joined
+                </div>
+                <form id="signupForm" onsubmit="handleSignup(event)">
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="Your email address" 
+                        required
+                        aria-label="Email address"
+                    >
+                    <input type="text" name="honeypot" style="display: none;">
+                    <div id="emailError" class="error-message" style="display: none;"></div>
+                    <button type="submit" class="submit-button">
+                        <span class="button-text">SUBMIT</span>
+                        <span class="button-loading" style="display: none;">SECURING CLEARANCE...</span>
+                    </button>
+                </form>
+                <p class="privacy-notice">We'll notify you when POTUS launches. No spam. No BS.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Confirmation Screen (Hidden by default) -->
+    <section class="confirmation" id="confirmation" style="display: none;">
+        <div class="container">
+            <div class="confirmation-content">
+                <div class="seal-animation">🦅</div>
+                <h2>CONFIRMED</h2>
+                <p class="confirmation-message">You're on the list, future President.</p>
+                <p class="confirmation-submessage">Check your email for your security clearance.<br>We'll brief you when POTUS launches.</p>
+                <div class="share-section">
+                    <p>SHARE YOUR AMBITION</p>
+                    <div class="share-buttons">
+                        <button onclick="shareTwitter()">Twitter</button>
+                        <button onclick="shareLinkedIn()">LinkedIn</button>
+                        <button onclick="copyLink()">Copy Link</button>
+                    </div>
+                    <p class="share-tagline">"Tell others: I'm ready to lead."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>POTUS © 2025</p>
+        </div>
+    </footer>
+
+    <!-- Mobile Sticky CTA (Hidden by default) -->
+    <button class="mobile-sticky-cta" onclick="scrollToSignup()">GET EARLY ACCESS</button>
+
+    <script>
+        // Smooth scrolling to signup section
+        function scrollToSignup() {
+            document.getElementById('signup').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Handle form submission
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const emailInput = document.getElementById('email');
+            const submitButton = form.querySelector('.submit-button');
+            const buttonText = submitButton.querySelector('.button-text');
+            const buttonLoading = submitButton.querySelector('.button-loading');
+            const errorDiv = document.getElementById('emailError');
+            const honeypot = form.querySelector('input[name="honeypot"]');
+            
+            // Clear previous errors
+            errorDiv.style.display = 'none';
+            emailInput.classList.remove('input-error');
+            
+            // Check honeypot for spam
+            if (honeypot.value) {
+                return false;
+            }
+            
+            const email = emailInput.value.trim();
+            
+            // Validate email
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address');
+                return false;
+            }
+            
+            // Show loading state
+            submitButton.disabled = true;
+            buttonText.style.display = 'none';
+            buttonLoading.style.display = 'inline';
+            
+            try {
+                // Send to backend API
+                const response = await fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Update counter with real count
+                    const countElement = document.getElementById('signupCount');
+                    countElement.textContent = result.totalSubscribers;
+                    
+                    // Show confirmation screen
+                    showConfirmation();
+                } else {
+                    if (response.status === 409) {
+                        showError('This email is already subscribed!');
+                    } else {
+                        showError(result.error || 'Something went wrong. Please try again.');
+                    }
+                    
+                    // Reset button state
+                    submitButton.disabled = false;
+                    buttonText.style.display = 'inline';
+                    buttonLoading.style.display = 'none';
+                }
+                
+            } catch (error) {
+                showError('Connection error. Please check your internet and try again.');
+                
+                // Reset button state
+                submitButton.disabled = false;
+                buttonText.style.display = 'inline';
+                buttonLoading.style.display = 'none';
+            }
+        }
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('emailError');
+            const emailInput = document.getElementById('email');
+            
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            emailInput.classList.add('input-error');
+        }
+
+        // Show confirmation screen
+        function showConfirmation() {
+            document.getElementById('signup').style.display = 'none';
+            document.getElementById('confirmation').style.display = 'flex';
+            document.querySelector('.mobile-sticky-cta').style.display = 'none';
+        }
+
+        // Social sharing functions
+        function shareTwitter() {
+            const text = "I'm ready to step into the Oval Office. Will you make the calls that shape history?";
+            const url = "https://playpotus.com";
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+            window.open(twitterUrl, '_blank', 'width=600,height=400');
+        }
+
+        function shareLinkedIn() {
+            const url = "https://playpotus.com";
+            const title = "POTUS - The Presidential Decision Simulation";
+            const summary = "Every decision echoes through history. Are you ready to command the free world?";
+            const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+            window.open(linkedInUrl, '_blank', 'width=600,height=400');
+        }
+
+        function copyLink() {
+            const url = "https://playpotus.com";
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(() => {
+                    showCopySuccess();
+                }).catch(() => {
+                    fallbackCopyLink(url);
+                });
+            } else {
+                fallbackCopyLink(url);
+            }
+        }
+
+        function fallbackCopyLink(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showCopySuccess();
+            } catch (err) {
+                console.error('Failed to copy link');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showCopySuccess() {
+            const copyButton = document.querySelector('.share-buttons button:nth-child(3)');
+            const originalText = copyButton.textContent;
+            copyButton.textContent = 'Copied!';
+            copyButton.style.background = 'var(--gold)';
+            copyButton.style.color = 'var(--bg-dark)';
+            
+            setTimeout(() => {
+                copyButton.textContent = originalText;
+                copyButton.style.background = 'transparent';
+                copyButton.style.color = 'var(--gold)';
+            }, 2000);
+        }
+
+        // Show mobile sticky CTA when scrolling past hero
+        function handleScroll() {
+            const hero = document.querySelector('.hero');
+            const mobileCTA = document.querySelector('.mobile-sticky-cta');
+            const signup = document.getElementById('signup');
+            const confirmation = document.getElementById('confirmation');
+            
+            if (confirmation.style.display === 'flex') {
+                mobileCTA.style.display = 'none';
+                return;
+            }
+            
+            const heroBottom = hero.offsetTop + hero.offsetHeight;
+            const signupTop = signup.offsetTop;
+            const scrollY = window.scrollY;
+            
+            if (scrollY > heroBottom && scrollY < signupTop - 100) {
+                mobileCTA.style.display = 'block';
+            } else {
+                mobileCTA.style.display = 'none';
+            }
+        }
+
+        // Initialize scroll handler
+        window.addEventListener('scroll', handleScroll);
+        
+        // Counter animation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const counter = document.getElementById('signupCount');
+            const targetCount = 247;
+            let currentCount = 200;
+            
+            const incrementCounter = () => {
+                if (currentCount < targetCount) {
+                    currentCount += Math.ceil((targetCount - currentCount) / 10);
+                    counter.textContent = currentCount;
+                    setTimeout(incrementCounter, 50);
+                } else {
+                    counter.textContent = targetCount;
+                }
+            };
+            
+            // Start counter animation after a delay
+            setTimeout(incrementCounter, 500);
+        });
+
+        // Intersection Observer for stake line animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const stakeLines = document.querySelectorAll('.stake-line');
+            stakeLines.forEach(line => {
+                line.style.animationPlayState = 'paused';
+                observer.observe(line);
+            });
+        });
+    </script>
+</body>
+</html>
