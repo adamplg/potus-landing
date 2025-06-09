@@ -573,22 +573,22 @@
             .hero {
                 height: 100vh;
                 height: -webkit-fill-available;
+                position: relative;
+                overflow: hidden;
             }
             
             .hero-bg {
                 background-image: url('attached_assets/WH_BG_MOB.jpg');
                 background-attachment: scroll;
-                position: fixed;
+                position: absolute;
                 top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
-                width: 100vw;
-                height: 100vh;
-                -webkit-backface-visibility: hidden;
-                backface-visibility: hidden;
-                -webkit-perspective: 1000;
-                perspective: 1000;
+                width: 100%;
+                height: 100%;
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
             }
             .potus-seal {
                 top: 10vh;
@@ -784,8 +784,8 @@
         <div class="container">
             <div class="stakes-content">
                 <p class="stake-line">When Mike calls you 'Mr. President,' you'll feel the weight of it.</p>
-                <p class="stake-line">Your enemies can turn into allies, and your allies can turn their backs - it all depends on your diplomacy skills</p>
-                <p class="stake-line">When you say "Get me General Tanaka on the line", you'll feel what it's like to command the mightiest army on earth</p>
+                <p class="stake-line">Your enemies can turn into allies, and your allies can turn their backs - it all depends on your diplomacy skills.</p>
+                <p class="stake-line">When you say "Get me General Tanaka on the line", you'll feel what it's like to command the mightiest army on earth.</p>
             </div>
         </div>
     </section>
@@ -850,17 +850,22 @@
     <button class="mobile-sticky-cta" onclick="scrollToSignup()">GET EARLY ACCESS</button>
 
     <script>
-        // Detect Safari browser
-        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        const isMobileSafari = isSafari && /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        
-        // Add Safari-specific class to body
-        if (isSafari) {
-            document.body.classList.add('safari');
-            if (isMobileSafari) {
-                document.body.classList.add('safari-mobile');
+        // Detect Safari browser and add classes when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const userAgent = navigator.userAgent;
+            
+            // Very specific Safari detection - only true Safari, not Chrome/Edge/etc
+            const isActualSafari = /Version\/.*Safari/.test(userAgent) && !/Chrome|Chromium|Edge|OPR/.test(userAgent);
+            const isMobileSafari = isActualSafari && /iPhone|iPad|iPod/.test(userAgent);
+            
+            // Add Safari-specific class to body only for actual Safari
+            if (isActualSafari) {
+                document.body.classList.add('safari');
+                if (isMobileSafari) {
+                    document.body.classList.add('safari-mobile');
+                }
             }
-        }
+        });
 
         // Smooth scrolling to signup section
         function scrollToSignup() {
