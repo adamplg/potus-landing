@@ -12,13 +12,15 @@
     <!-- Open Graph -->
     <meta property="og:title" content="POTUS - Command the Free World">
     <meta property="og:description" content="The weight of the presidency, in your hands. Make the calls that shape history.">
-    <meta property="og:image" content="attached_assets/potus_open_graph.jpg">
+    <meta property="og:image" content="https://playpotus.com/attached_assets/potus_open_graph.jpg">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://playpotus.com">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="POTUS - Command the Free World">
     <meta name="twitter:description" content="Every decision echoes through history.">
+    <meta name="twitter:image" content="https://playpotus.com/attached_assets/potus_open_graph.jpg">
     
     <!-- Fonts with font-display swap for better performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,11 +74,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('attached_assets/white_house_background1.png');
+            background-image: url('attached_assets/WH_BG_DESK.jpg');
             background-size: cover;
             background-position: center;
-            filter: brightness(0.3) blur(2px);
+            filter: brightness(0.7) blur(2px);
             z-index: -1;
+            animation: brightenImage 10s linear forwards;
         }
 
         .hero-bg::after {
@@ -86,16 +89,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(13,17,23,0.4) 0%, rgba(13,17,23,0.8) 100%);
-            animation: brightenBackground 60s ease-in-out forwards;
+            background: #020218;
+            animation: brightenBackground 10s ease-out forwards;
         }
 
         @keyframes brightenBackground {
-            from {
+            0% {
                 opacity: 1;
             }
-            to {
-                opacity: 0.3;
+            10% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 0;
             }
         }
 
@@ -113,6 +119,8 @@
             line-height: 1.1;
             margin-bottom: 24px;
             letter-spacing: -1px;
+            animation: fadeOutText 10s linear forwards;
+            animation-delay: 4s;
         }
 
         .hero-subtitle {
@@ -120,6 +128,8 @@
             margin-bottom: 48px;
             opacity: 0.9;
             font-weight: 300;
+            animation: fadeOutText 10s linear forwards;
+            animation-delay: 4s;
         }
 
         .cta-button {
@@ -171,10 +181,17 @@
         }
 
         .feature-icon {
-            font-size: 48px;
+            width: 64px;
+            height: 64px;
             margin-bottom: 24px;
             display: inline-block;
             animation: pulse 2s infinite;
+        }
+        
+        .feature-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .feature-card h3 {
@@ -193,6 +210,31 @@
         .stakes {
             padding: 120px 0;
             background: var(--bg-dark);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stakes::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: 0;
+            width: 100%;
+            height: 120%;
+            background-image: url('attached_assets/DC2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.3;
+            filter: brightness(1.15);
+            z-index: 0;
+            will-change: transform;
+            transform: translateY(var(--parallax-offset, 0));
+        }
+        
+        .stakes .container {
+            position: relative;
+            z-index: 1;
         }
 
         .stakes-content {
@@ -386,6 +428,14 @@
             z-index: 1000;
             display: none;
             box-shadow: 0 8px 32px rgba(205, 146, 24, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        
+        .mobile-sticky-cta.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Scroll Hint Arrow */
@@ -489,17 +539,62 @@
                 transform: scale(1);
             }
         }
+        
+        @keyframes fadeOutText {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        
+        @keyframes brightenImage {
+            0% {
+                filter: brightness(0.7) blur(2px);
+            }
+            50% {
+                filter: brightness(0.7) blur(2px);
+            }
+            100% {
+                filter: brightness(0.91) blur(2px);
+            }
+        }
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .hero {
+                height: 100vh;
+                height: -webkit-fill-available;
+            }
+            
+            .hero-bg {
+                background-image: url('attached_assets/WH_BG_MOB.jpg');
+                background-attachment: scroll;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100vw;
+                height: 100vh;
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+                -webkit-perspective: 1000;
+                perspective: 1000;
+            }
             .potus-seal {
-                top: 12vh;
-                width: 120px;
-                height: 120px;
+                top: 10vh;
+                width: 173px;
+                height: 173px;
             }
             
             .hero-content {
-                margin-top: 80px;
+                margin-top: 120px;
+            }
+            
+            .cta-button {
+                margin-top: 40px;
             }
 
             .hero-title {
@@ -614,17 +709,23 @@
         <div class="container">
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🎙️</div>
+                    <div class="feature-icon">
+                        <img src="attached_assets/VOICE.png" alt="Voice calls icon">
+                    </div>
                     <h3>Real Voice Calls</h3>
                     <p>Talk to AI advisors like the CIA Director, Joint Chiefs, and SecState.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">⏱️</div>
+                    <div class="feature-icon">
+                        <img src="attached_assets/DECIDE.png" alt="Real-time decisions icon">
+                    </div>
                     <h3>Real-Time Decisions</h3>
                     <p>Time passes with or without you. Every second counts.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🧠</div>
+                    <div class="feature-icon">
+                        <img src="attached_assets/SCENARIO.png" alt="Dynamic scenarios icon">
+                    </div>
                     <h3>Dynamic Scenarios</h3>
                     <p>Crises evolve based on your strategy, alliances, and guts.</p>
                 </div>
@@ -851,14 +952,44 @@
             
             if (isMobile && scrollY > heroBottom && scrollY < signupTop - 100) {
                 mobileCTA.style.display = 'block';
+                setTimeout(() => {
+                    mobileCTA.classList.add('show');
+                }, 10);
             } else {
-                mobileCTA.style.display = 'none';
+                mobileCTA.classList.remove('show');
+                setTimeout(() => {
+                    if (!mobileCTA.classList.contains('show')) {
+                        mobileCTA.style.display = 'none';
+                    }
+                }, 500);
             }
         }
 
         // Initialize scroll handler
         window.addEventListener('scroll', handleScroll);
         window.addEventListener('resize', handleScroll);
+        
+        // Parallax effect for stakes background
+        function handleParallax() {
+            const stakes = document.querySelector('.stakes');
+            const stakesBg = document.querySelector('.stakes::before');
+            
+            if (stakes) {
+                const scrolled = window.pageYOffset;
+                const stakesTop = stakes.offsetTop;
+                const stakesHeight = stakes.offsetHeight;
+                const windowHeight = window.innerHeight;
+                
+                // Check if stakes section is in viewport
+                if (scrolled + windowHeight > stakesTop && scrolled < stakesTop + stakesHeight) {
+                    const yPos = -((scrolled - stakesTop) * 0.1);
+                    stakes.style.setProperty('--parallax-offset', `${yPos}px`);
+                }
+            }
+        }
+        
+        window.addEventListener('scroll', handleParallax);
+        window.addEventListener('resize', handleParallax);
 
         // Intersection Observer for stake line animations
         const observerOptions = {
