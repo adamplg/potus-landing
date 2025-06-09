@@ -12,15 +12,15 @@
     <!-- Open Graph -->
     <meta property="og:title" content="POTUS - Command the Free World">
     <meta property="og:description" content="The weight of the presidency, in your hands. Make the calls that shape history.">
-    <meta property="og:image" content="https://playpotus.com/attached_assets/potus_open_graph.jpg">
+    <meta property="og:image" content="https://bepotus.ai/attached_assets/potus_open_graph.jpg">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://playpotus.com">
+    <meta property="og:url" content="https://bepotus.ai">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="POTUS - Command the Free World">
     <meta name="twitter:description" content="Every decision echoes through history.">
-    <meta name="twitter:image" content="https://playpotus.com/attached_assets/potus_open_graph.jpg">
+    <meta name="twitter:image" content="https://bepotus.ai/attached_assets/potus_open_graph.jpg">
     
     <!-- Fonts with font-display swap for better performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -243,8 +243,8 @@
 
         .stake-line {
             font-family: var(--font-hero);
-            font-size: 36px;
-            margin-bottom: 32px;
+            font-size: 32px;
+            margin-bottom: 48px;
             opacity: 0;
             animation: fadeIn 1s ease-out forwards;
         }
@@ -345,9 +345,16 @@
         }
 
         .seal-animation {
-            font-size: 96px;
-            margin-bottom: 32px;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 32px;
             animation: fadeInScale 0.6s ease-out;
+        }
+
+        .seal-animation img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .confirmation h2 {
@@ -628,7 +635,7 @@
             }
 
             .stake-line {
-                font-size: 24px;
+                font-size: 22px;
             }
 
             .signup {
@@ -668,11 +675,50 @@
             }
 
             .stake-line {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             .seal-animation {
-                font-size: 72px;
+                width: 96px;
+                height: 96px;
+            }
+        }
+
+        /* Safari Mobile Specific Fixes */
+        .safari-mobile .hero-bg {
+            position: absolute !important;
+            background-attachment: scroll !important;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: auto;
+        }
+
+        .safari-mobile .hero-bg::after {
+            animation: none;
+            opacity: 0;
+        }
+
+        @media (max-width: 768px) {
+            .safari-mobile .hero-bg {
+                /* Disable blur animation on Safari mobile for performance */
+                animation: none;
+                filter: brightness(0.85) blur(0.5px);
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+            }
+
+            .safari-mobile .hero {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .safari-mobile .hero-title,
+            .safari-mobile .hero-subtitle {
+                /* Disable text fade animation on Safari mobile */
+                animation: none;
             }
         }
 
@@ -713,21 +759,21 @@
                         <img src="attached_assets/VOICE.png" alt="Voice calls icon">
                     </div>
                     <h3>Real Voice Calls</h3>
-                    <p>Talk to AI advisors like the CIA Director, Joint Chiefs, and SecState.</p>
+                    <p>Call the CIA Director, Joint Chiefs, and Secretary of State to get advice and issue orders.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <img src="attached_assets/DECIDE.png" alt="Real-time decisions icon">
                     </div>
-                    <h3>Real-Time Decisions</h3>
-                    <p>Time passes with or without you. Every second counts.</p>
+                    <h3>Take Command</h3>
+                    <p>Your advisor will help - but the final word is yours, and so is the nation's fate.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <img src="attached_assets/SCENARIO.png" alt="Dynamic scenarios icon">
                     </div>
                     <h3>Dynamic Scenarios</h3>
-                    <p>Crises evolve based on your strategy, alliances, and guts.</p>
+                    <p>Go to war, fight terror, win an election, rescue a spy, negotiate a treat - these are just a few of the crises you'll face.</p>
                 </div>
             </div>
         </div>
@@ -737,9 +783,9 @@
     <section class="stakes">
         <div class="container">
             <div class="stakes-content">
-                <p class="stake-line">Will you stop the war, or escalate it?</p>
-                <p class="stake-line">Will your Cabinet support you — or resign on live TV?</p>
-                <p class="stake-line">Will history call you a savior, or a tyrant?</p>
+                <p class="stake-line">When Mike calls you 'Mr. President,' you'll feel the weight of it.</p>
+                <p class="stake-line">Your enemies can turn into allies, and your allies can turn their backs - it all depends on your diplomacy skills</p>
+                <p class="stake-line">When you say "Get me General Tanaka on the line", you'll feel what it's like to command the mightiest army on earth</p>
             </div>
         </div>
     </section>
@@ -774,7 +820,9 @@
     <section class="confirmation" id="confirmation" style="display: none;">
         <div class="container">
             <div class="confirmation-content">
-                <div class="seal-animation">🦅</div>
+                <div class="seal-animation">
+                    <img src="attached_assets/simple_seal_logo.png" alt="POTUS Seal" />
+                </div>
                 <h2>CONFIRMED</h2>
                 <p class="confirmation-message">You're on the list, future President.</p>
                 <p class="confirmation-submessage">Check your email for your security clearance.<br>We'll brief you when POTUS launches.</p>
@@ -785,7 +833,7 @@
                         <button onclick="shareLinkedIn()">LinkedIn</button>
                         <button onclick="copyLink()">Copy Link</button>
                     </div>
-                    <p class="share-tagline">"Tell others: I'm ready to lead."</p>
+                    <p class="share-tagline">"I'm on the list to play POTUS! Get on the waitlist to join me in the situation room."</p>
                 </div>
             </div>
         </div>
@@ -802,6 +850,18 @@
     <button class="mobile-sticky-cta" onclick="scrollToSignup()">GET EARLY ACCESS</button>
 
     <script>
+        // Detect Safari browser
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        const isMobileSafari = isSafari && /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        
+        // Add Safari-specific class to body
+        if (isSafari) {
+            document.body.classList.add('safari');
+            if (isMobileSafari) {
+                document.body.classList.add('safari-mobile');
+            }
+        }
+
         // Smooth scrolling to signup section
         function scrollToSignup() {
             document.getElementById('signup').scrollIntoView({
@@ -869,14 +929,14 @@
 
         // Social sharing functions
         function shareTwitter() {
-            const text = "I'm ready to step into the Oval Office. Will you make the calls that shape history?";
-            const url = "https://playpotus.com";
+            const text = "I'm on the list to play POTUS! Get on the waitlist to join me in the situation room.";
+            const url = "https://bepotus.ai";
             const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
             window.open(twitterUrl, '_blank', 'width=600,height=400');
         }
 
         function shareLinkedIn() {
-            const url = "https://playpotus.com";
+            const url = "https://bepotus.ai";
             const title = "POTUS - The Presidential Decision Simulation";
             const summary = "Every decision echoes through history. Are you ready to command the free world?";
             const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
@@ -884,7 +944,7 @@
         }
 
         function copyLink() {
-            const url = "https://playpotus.com";
+            const url = "https://bepotus.ai";
             
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(url).then(() => {
