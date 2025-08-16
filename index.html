@@ -153,6 +153,40 @@
             box-shadow: 0 10px 30px rgba(205, 146, 24, 0.3);
         }
 
+        /* Video Section */
+        .video-section {
+            padding: 80px 0;
+            background: var(--bg-dark);
+        }
+
+        .video-title {
+            font-family: var(--font-hero);
+            font-size: 42px;
+            text-align: center;
+            color: var(--gold);
+            margin-bottom: 48px;
+            letter-spacing: 3px;
+            font-weight: 600;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(205, 146, 24, 0.2);
+        }
+
+        .video-wrapper video {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #000;
+        }
+
         /* Features Section */
         .features {
             padding: 120px 0;
@@ -570,6 +604,18 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .video-section {
+                padding: 60px 0;
+            }
+
+            .video-title {
+                font-size: 28px;
+                margin-bottom: 32px;
+            }
+
+            .video-wrapper {
+                border-radius: 8px;
+            }
             .hero {
                 height: 100vh;
                 height: -webkit-fill-available;
@@ -747,6 +793,24 @@
         </div>
         <div class="scroll-hint">
             <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="video-section">
+        <div class="container">
+            <h2 class="video-title">POTUS TEASER VIDEO</h2>
+            <div class="video-wrapper">
+                <video 
+                    controls
+                    poster="attached_assets/video_poster.jpg"
+                    preload="metadata"
+                    playsinline
+                >
+                    <source src="attached_assets/copy_compressed_h264.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
         </div>
     </section>
 
