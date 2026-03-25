@@ -1220,6 +1220,16 @@
                 });
                 
                 if (response.ok) {
+                    // Fire GA4 sign_up event with traffic source info
+                    const urlParams = new URLSearchParams(window.location.search);
+                    gtag('event', 'sign_up', {
+                        method: 'email',
+                        utm_source: urlParams.get('utm_source') || '(none)',
+                        utm_medium: urlParams.get('utm_medium') || '(none)',
+                        utm_campaign: urlParams.get('utm_campaign') || '(none)',
+                        page_referrer: document.referrer || '(direct)'
+                    });
+
                     // Show confirmation screen
                     document.getElementById('signup').style.display = 'none';
                     document.getElementById('confirmation').style.display = 'flex';
