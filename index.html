@@ -1249,6 +1249,8 @@
                     }),
                     fetch('https://script.google.com/macros/s/AKfycbx9plNmHs8tbTzyqLqMGVYzXMbG1oXM6kb4e1feRCElUKNFVox6sGxwlww5qwBTTueQfQ/exec', {
                         method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
                         body: JSON.stringify(sheetData)
                     }).catch(function() {})
                 ]);
