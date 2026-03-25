@@ -1,6 +1,6 @@
 # POTUS Landing Page
 
-A landing page for POTUS - an AI-powered presidential decision simulation game by Stratara.
+A landing page for POTUS - an AI-powered presidential decision simulation game by [Stratara AI](https://stratara.ai).
 
 ## Overview
 
@@ -8,18 +8,25 @@ POTUS is an interactive leadership simulation where players step into the role o
 
 ## Features
 
-- **Hero Section**: Dramatic White House imagery with animated text effects
-- **Video Teaser**: Embedded video showcasing the game experience  
+- **Hero Section**: Dramatic White House imagery with animated fade-in effects
+- **Video Teaser**: Embedded video showcasing the game experience
+- **Screenshots Gallery**: Horizontal scrollable gallery of in-game screenshots with lightbox carousel (keyboard, touch swipe, and click navigation)
 - **Key Features Display**: Highlights of voice calls, command decisions, and dynamic scenarios
 - **Email Signup**: Early access form (limited to 500 users) with Basin form backend
 - **Confirmation Screen**: Post-signup confirmation with social sharing options
 - **Responsive Design**: Optimized for desktop and mobile devices
 - **Safari-specific optimizations**: Special handling for Safari mobile performance
 
+## Analytics & Tracking
+
+- **Google Analytics 4** (GA4): Page views, scroll tracking, and custom `sign_up` event with UTM parameter and referrer capture
+- **Google Search Console**: Connected for search query insights
+
 ## Tech Stack
 
 - Pure HTML/CSS/JavaScript (no framework dependencies)
 - Basin for form handling
+- Google Analytics 4 for tracking
 - Custom animations and parallax effects
 - Mobile-optimized with sticky CTA button
 
@@ -27,6 +34,7 @@ POTUS is an interactive leadership simulation where players step into the role o
 
 The `attached_assets/` directory contains:
 - Background images (White House office for desktop/mobile)
+- Game screenshots (login, secure lines, CIA call, JSOC call, orders)
 - Feature icons (VOICE, DECIDE, SCENARIO)
 - POTUS seal and logos
 - Teaser video (H.264 compressed)
