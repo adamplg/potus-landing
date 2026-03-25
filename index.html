@@ -1240,36 +1240,25 @@
                     city: geoCity
                 };
 
-                // Send to both Basin and Google Sheets in parallel
-                const [basinResponse] = await Promise.all([
-                    fetch('https://usebasin.com/f/65fbb06895d4', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email })
-                    }),
-                    fetch('https://script.google.com/macros/s/AKfycbx9plNmHs8tbTzyqLqMGVYzXMbG1oXM6kb4e1feRCEIUKNFVox6sGxwIww5qwBTTueQfQ/exec', {
-                        method: 'POST',
-                        body: JSON.stringify(sheetData)
-                    }).catch(function() {})
-                ]);
+                // Send to Google Sheets
+                await fetch('https://script.google.com/macros/s/AKfycbx9plNmHs8tbTzyqLqMGVYzXMbG1oXM6kb4e1feRCEIUKNFVox6sGxwIww5qwBTTueQfQ/exec', {
+                    method: 'POST',
+                    body: JSON.stringify(sheetData)
+                }).catch(function() {});
 
-                if (basinResponse.ok) {
-                    // Fire GA4 sign_up event with traffic source info
-                    gtag('event', 'sign_up', {
-                        method: 'email',
-                        utm_source: urlParams.get('utm_source') || '(none)',
-                        utm_medium: urlParams.get('utm_medium') || '(none)',
-                        utm_campaign: urlParams.get('utm_campaign') || '(none)',
-                        page_referrer: document.referrer || '(direct)'
-                    });
+                // Fire GA4 sign_up event with traffic source info
+                gtag('event', 'sign_up', {
+                    method: 'email',
+                    utm_source: urlParams.get('utm_source') || '(none)',
+                    utm_medium: urlParams.get('utm_medium') || '(none)',
+                    utm_campaign: urlParams.get('utm_campaign') || '(none)',
+                    page_referrer: document.referrer || '(direct)'
+                });
 
-                    // Show confirmation screen
-                    document.getElementById('signup').style.display = 'none';
-                    document.getElementById('confirmation').style.display = 'flex';
-                    document.querySelector('.mobile-sticky-cta').style.display = 'none';
-                } else {
-                    throw new Error("Form error");
-                }
+                // Show confirmation screen
+                document.getElementById('signup').style.display = 'none';
+                document.getElementById('confirmation').style.display = 'flex';
+                document.querySelector('.mobile-sticky-cta').style.display = 'none';
             } catch (err) {
                 errorDiv.textContent = 'Something went wrong. Please try again.';
                 errorDiv.style.display = 'block';
