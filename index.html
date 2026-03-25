@@ -1214,6 +1214,19 @@
             
             try {
                 const urlParams = new URLSearchParams(window.location.search);
+
+                // Fetch geo data (non-blocking — defaults to empty if it fails)
+                var geoCountry = '';
+                var geoCity = '';
+                try {
+                    const geoRes = await fetch('https://ipapi.co/json/');
+                    if (geoRes.ok) {
+                        const geo = await geoRes.json();
+                        geoCountry = geo.country_name || '';
+                        geoCity = geo.city || '';
+                    }
+                } catch (e) {}
+
                 const sheetData = {
                     email: email,
                     referrer: document.referrer || '',
@@ -1222,7 +1235,9 @@
                     utm_campaign: urlParams.get('utm_campaign') || '',
                     language: navigator.language || '',
                     screen: screen.width + 'x' + screen.height,
-                    user_agent: navigator.userAgent || ''
+                    user_agent: navigator.userAgent || '',
+                    country: geoCountry,
+                    city: geoCity
                 };
 
                 // Send to both Basin and Google Sheets in parallel
