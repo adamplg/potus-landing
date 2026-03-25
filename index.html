@@ -1213,15 +1213,33 @@
             buttonLoading.style.display = 'inline';
             
             try {
-                const response = await fetch('https://usebasin.com/f/65fbb06895d4', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-                
-                if (response.ok) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const sheetData = {
+                    email: email,
+                    referrer: document.referrer || '',
+                    utm_source: urlParams.get('utm_source') || '',
+                    utm_medium: urlParams.get('utm_medium') || '',
+                    utm_campaign: urlParams.get('utm_campaign') || '',
+                    language: navigator.language || '',
+                    screen: screen.width + 'x' + screen.height,
+                    user_agent: navigator.userAgent || ''
+                };
+
+                // Send to both Basin and Google Sheets in parallel
+                const [basinResponse] = await Promise.all([
+                    fetch('https://usebasin.com/f/65fbb06895d4', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    }),
+                    fetch('https://script.google.com/macros/s/AKfycbx9plNmHs8tbTzyqLqMGVYzXMbG1oXM6kb4e1feRCElUKNFVox6sGxwlww5qwBTTueQfQ/exec', {
+                        method: 'POST',
+                        body: JSON.stringify(sheetData)
+                    }).catch(function() {})
+                ]);
+
+                if (basinResponse.ok) {
                     // Fire GA4 sign_up event with traffic source info
-                    const urlParams = new URLSearchParams(window.location.search);
                     gtag('event', 'sign_up', {
                         method: 'email',
                         utm_source: urlParams.get('utm_source') || '(none)',
