@@ -17,21 +17,32 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="attached_assets/potus_favicon.png">
-    
+    <link rel="apple-touch-icon" href="attached_assets/apple-touch-icon.png">
+    <meta name="theme-color" content="#0D1117">
+
+    <!-- Preload the hero background so it can start downloading before CSS is parsed -->
+    <link rel="preload" as="image" href="attached_assets/WH_BG_DESK.jpg" media="(min-width: 769px)">
+    <link rel="preload" as="image" href="attached_assets/WH_BG_MOB.jpg" media="(max-width: 768px)">
+
     <!-- Open Graph -->
+    <meta property="og:site_name" content="POTUS">
     <meta property="og:title" content="POTUS - Command the Free World">
     <meta property="og:description" content="The weight of the presidency, in your hands. Make the calls that shape history.">
     <meta property="og:image" content="https://bepotus.ai/attached_assets/potus_open_graph.jpg">
+    <meta property="og:image:width" content="1536">
+    <meta property="og:image:height" content="1024">
+    <meta property="og:image:alt" content="The POTUS presidential seal over the Oval Office">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://bepotus.ai">
     <link rel="canonical" href="https://bepotus.ai">
-    
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="POTUS - Command the Free World">
     <meta name="twitter:description" content="Every decision echoes through history.">
     <meta name="twitter:image" content="https://bepotus.ai/attached_assets/potus_open_graph.jpg">
-    
+    <meta name="twitter:image:alt" content="The POTUS presidential seal over the Oval Office">
+
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -59,10 +70,8 @@
     <!-- Fonts with font-display swap for better performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500;600&display=swap');
-    </style>
-    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500;600&display=swap">
+
     <style>
         * {
             margin: 0;
@@ -146,6 +155,10 @@
             margin-top: 180px;
         }
 
+        /* The headline and subtitle stay visible. They previously animated to
+           opacity:0 with `forwards`, which permanently erased the value
+           proposition ~14s after load and left the hero empty on scroll-back.
+           The background brighten below still carries the cinematic reveal. */
         .hero-title {
             font-family: var(--font-hero);
             font-size: 72px;
@@ -153,8 +166,7 @@
             line-height: 1.1;
             margin-bottom: 24px;
             letter-spacing: -1px;
-            animation: fadeOutText 10s linear forwards;
-            animation-delay: 4s;
+            text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
         }
 
         .hero-subtitle {
@@ -162,8 +174,7 @@
             margin-bottom: 48px;
             opacity: 0.9;
             font-weight: 300;
-            animation: fadeOutText 10s linear forwards;
-            animation-delay: 4s;
+            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
         }
 
         .cta-button {
@@ -680,6 +691,43 @@
             border-top: 1px solid rgba(205, 146, 24, 0.1);
         }
 
+        .footer-link {
+            color: rgba(205, 146, 24, 0.6);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover,
+        .footer-link:focus-visible {
+            color: var(--gold);
+        }
+
+        .footer-meta {
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .privacy-link {
+            color: rgba(205, 146, 24, 0.8);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .privacy-link:hover,
+        .privacy-link:focus-visible {
+            color: var(--gold);
+        }
+
+        /* Visible keyboard focus. Without this, tabbing through the page gives
+           no indication of position on browsers that suppress the default ring. */
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        .screenshot-item:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: 3px;
+        }
+
         /* Mobile Sticky CTA */
         .mobile-sticky-cta {
             position: fixed;
@@ -807,15 +855,6 @@
             to {
                 opacity: 1;
                 transform: scale(1);
-            }
-        }
-        
-        @keyframes fadeOutText {
-            0% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
             }
         }
         
@@ -992,11 +1031,37 @@
                 position: relative;
                 overflow: hidden;
             }
+        }
 
-            .safari-mobile .hero-title,
-            .safari-mobile .hero-subtitle {
-                /* Disable text fade animation on Safari mobile */
-                animation: none;
+        /* Respect users who ask the OS to reduce motion (vestibular disorders,
+           migraine triggers, or simple preference). Content must still end up
+           in its final visible state, so opacity is forced rather than just
+           stopping the animations. */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            .hero-bg {
+                filter: brightness(0.91) blur(0.4px);
+            }
+
+            .hero-bg::after {
+                opacity: 0;
+            }
+
+            .stake-line,
+            .hero-content {
+                opacity: 1;
+            }
+
+            .stakes::before {
+                transform: none;
             }
         }
 
@@ -1017,7 +1082,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-bg"></div>
-        <img src="attached_assets/potus_seal.PNG" alt="POTUS Seal" class="potus-seal">
+        <img src="attached_assets/potus_seal.webp" alt="The Seal of the President of the United States" class="potus-seal" width="150" height="150" fetchpriority="high" decoding="async">
         <div class="hero-content">
             <h1 class="hero-title">WANT TO BE THE PRESIDENT?</h1>
             <p class="hero-subtitle">A real-time political simulation. Make the calls. Face the consequences.</p>
@@ -1033,11 +1098,13 @@
         <div class="container">
             <h2 class="video-title">POTUS TEASER VIDEO</h2>
             <div class="video-wrapper">
-                <video 
+                <video
                     controls
                     poster="attached_assets/video_poster.jpg"
                     preload="metadata"
                     playsinline
+                    width="1080"
+                    height="1920"
                 >
                     <source src="attached_assets/POTUS_TEASER.mp4" type="video/mp4">
                     Your browser does not support the video tag.
@@ -1051,21 +1118,23 @@
         <div class="container">
             <h2 class="screenshots-title">INSIDE THE OVAL OFFICE</h2>
         </div>
-        <div class="screenshots-track">
-            <div class="screenshot-item">
-                <img src="attached_assets/IMG_8228.jpg" alt="POTUS login screen" loading="lazy">
+        <!-- Each thumbnail is a 480px file; the 900px version in data-full is
+             fetched only when the lightbox actually opens. -->
+        <div class="screenshots-track" role="list">
+            <div class="screenshot-item" role="listitem" tabindex="0">
+                <img src="attached_assets/IMG_8228_thumb.webp" data-full="attached_assets/IMG_8228_full.webp" alt="POTUS login screen" loading="lazy" decoding="async" width="480" height="1040">
             </div>
-            <div class="screenshot-item">
-                <img src="attached_assets/IMG_8460.jpg" alt="Secure lines - your cabinet and commanders" loading="lazy">
+            <div class="screenshot-item" role="listitem" tabindex="0">
+                <img src="attached_assets/IMG_8460_thumb.webp" data-full="attached_assets/IMG_8460_full.webp" alt="Secure lines - your cabinet and commanders" loading="lazy" decoding="async" width="480" height="1040">
             </div>
-            <div class="screenshot-item">
-                <img src="attached_assets/IMG_8457 2.jpg" alt="Incoming secure call from CIA Director" loading="lazy">
+            <div class="screenshot-item" role="listitem" tabindex="0">
+                <img src="attached_assets/IMG_8457_2_thumb.webp" data-full="attached_assets/IMG_8457_2_full.webp" alt="Incoming secure call from CIA Director" loading="lazy" decoding="async" width="480" height="1040">
             </div>
-            <div class="screenshot-item">
-                <img src="attached_assets/IMG_8213 2.jpg" alt="In call with JSOC Commander" loading="lazy">
+            <div class="screenshot-item" role="listitem" tabindex="0">
+                <img src="attached_assets/IMG_8213_2_thumb.webp" data-full="attached_assets/IMG_8213_2_full.webp" alt="In call with JSOC Commander" loading="lazy" decoding="async" width="480" height="1040">
             </div>
-            <div class="screenshot-item">
-                <img src="attached_assets/IMG_8218 2.jpg" alt="Processing presidential orders" loading="lazy">
+            <div class="screenshot-item" role="listitem" tabindex="0">
+                <img src="attached_assets/IMG_8218_2_thumb.webp" data-full="attached_assets/IMG_8218_2_full.webp" alt="Processing presidential orders" loading="lazy" decoding="async" width="480" height="1040">
             </div>
         </div>
     </section>
@@ -1076,24 +1145,24 @@
             <div class="feature-grid">
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <img src="attached_assets/VOICE.png" alt="Voice calls icon">
+                        <img src="attached_assets/VOICE.webp" alt="" width="64" height="64" loading="lazy" decoding="async">
                     </div>
                     <h3>Real Voice Calls</h3>
                     <p>Call the CIA Director, Joint Chiefs, and Secretary of State to get advice and issue orders.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <img src="attached_assets/DECIDE.png" alt="Real-time decisions icon">
+                        <img src="attached_assets/DECIDE.webp" alt="" width="64" height="64" loading="lazy" decoding="async">
                     </div>
                     <h3>Take Command</h3>
                     <p>Your advisor will help - but the final word is yours, and so is the nation's fate.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <img src="attached_assets/SCENARIO.png" alt="Dynamic scenarios icon">
+                        <img src="attached_assets/SCENARIO.webp" alt="" width="64" height="64" loading="lazy" decoding="async">
                     </div>
                     <h3>Dynamic Scenarios</h3>
-                    <p>Go to war, fight terror, win an election, rescue a spy, negotiate a treat - these are just a few of the crises you'll face.</p>
+                    <p>Go to war, fight terror, win an election, rescue a spy, negotiate a treaty - these are just a few of the crises you'll face.</p>
                 </div>
             </div>
         </div>
@@ -1115,23 +1184,31 @@
         <div class="container">
             <div class="signup-box">
                 <h2>Join the first 500 to get exclusive early access.</h2>
-                <form id="signupForm">
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        placeholder="Your email address" 
+                <form id="signupForm" novalidate>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Your email address"
                         required
+                        autocomplete="email"
+                        inputmode="email"
+                        autocapitalize="off"
+                        spellcheck="false"
                         aria-label="Email address"
+                        aria-describedby="emailError"
                     >
-                    <input type="text" name="_gotcha" style="display: none;">
-                    <div id="emailError" class="error-message" style="display: none;"></div>
+                    <!-- Spam trap. tabindex/autocomplete/aria-hidden keep browser
+                         autofill and password managers from filling it, which would
+                         otherwise silently discard a real person's signup. -->
+                    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="display: none;">
+                    <div id="emailError" class="error-message" style="display: none;" role="alert" aria-live="polite"></div>
                     <button type="submit" class="submit-button">
-                        <span class="button-text">SUBMIT</span>
+                        <span class="button-text">GET EARLY ACCESS</span>
                         <span class="button-loading" style="display: none;">SECURING CLEARANCE...</span>
                     </button>
                 </form>
-                <p class="privacy-notice">We'll notify you when POTUS launches. No spam. No BS.</p>
+                <p class="privacy-notice">We'll notify you when POTUS launches. No spam. No BS.<br>See our <a href="privacy.html" class="privacy-link">Privacy Policy</a>.</p>
             </div>
         </div>
     </section>
@@ -1141,7 +1218,7 @@
         <div class="container">
             <div class="confirmation-content">
                 <div class="seal-animation">
-                    <img src="attached_assets/simple_seal_logo.png" alt="POTUS Seal" />
+                    <img src="attached_assets/simple_seal_logo.webp" alt="" width="120" height="120" loading="lazy" decoding="async" />
                 </div>
                 <h2>CONFIRMED</h2>
                 <p class="confirmation-message">You're on the list, future President.</p>
@@ -1149,9 +1226,9 @@
                 <div class="share-section">
                     <p>SHARE YOUR AMBITION</p>
                     <div class="share-buttons">
-                        <button onclick="shareTwitter()">Twitter</button>
-                        <button onclick="shareLinkedIn()">LinkedIn</button>
-                        <button onclick="copyLink()">Copy Link</button>
+                        <button type="button" onclick="shareX()">X</button>
+                        <button type="button" onclick="shareLinkedIn()">LinkedIn</button>
+                        <button type="button" id="copyLinkButton" onclick="copyLink()">Copy Link</button>
                     </div>
                     <p class="share-tagline">"I'm on the list to play POTUS! Get on the waitlist to join me in the situation room."</p>
                 </div>
@@ -1160,18 +1237,19 @@
     </section>
 
     <!-- Lightbox -->
-    <div class="lightbox-overlay" id="lightbox">
-        <button class="lightbox-close" id="lightboxClose">&times;</button>
-        <button class="lightbox-nav lightbox-prev" id="lightboxPrev">&#8249;</button>
-        <img class="lightbox-image" id="lightboxImage" src="" alt="Screenshot">
-        <button class="lightbox-nav lightbox-next" id="lightboxNext">&#8250;</button>
-        <div class="lightbox-counter" id="lightboxCounter"></div>
+    <div class="lightbox-overlay" id="lightbox" role="dialog" aria-modal="true" aria-label="Screenshot viewer">
+        <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close screenshot viewer">&times;</button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev" type="button" aria-label="Previous screenshot">&#8249;</button>
+        <img class="lightbox-image" id="lightboxImage" src="" alt="">
+        <button class="lightbox-nav lightbox-next" id="lightboxNext" type="button" aria-label="Next screenshot">&#8250;</button>
+        <div class="lightbox-counter" id="lightboxCounter" aria-live="polite"></div>
     </div>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>POTUS © 2025 · A <a href="https://stratara.ai" target="_blank" rel="noopener" style="color: rgba(205, 146, 24, 0.6); text-decoration: none; transition: color 0.2s ease;">Stratara AI</a> experience</p>
+            <p>POTUS © <span id="copyrightYear">2026</span> · A <a href="https://stratara.ai" target="_blank" rel="noopener" class="footer-link">Stratara AI</a> experience</p>
+            <p class="footer-meta"><a href="privacy.html" class="footer-link">Privacy Policy</a></p>
         </div>
     </footer>
 
@@ -1196,17 +1274,63 @@
             }
         });
 
+        function prefersReducedMotion() {
+            return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        }
+
+        // Keeps the footer year correct without anyone remembering to edit it.
+        document.getElementById('copyrightYear').textContent = new Date().getFullYear();
+
         // Smooth scrolling to signup section
         function scrollToSignup() {
             document.getElementById('signup').scrollIntoView({
-                behavior: 'smooth'
+                behavior: prefersReducedMotion() ? 'auto' : 'smooth'
+            });
+            // Land the visitor ready to type. Pointer devices only — on touch this
+            // would raise the keyboard over the form the moment they arrive.
+            const usesPointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            if (!usesPointer) return;
+            window.setTimeout(function() {
+                const email = document.getElementById('email');
+                if (email && email.offsetParent !== null) email.focus({ preventScroll: true });
+            }, prefersReducedMotion() ? 0 : 600);
+        }
+
+        const SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx9plNmHs8tbTzyqLqMGVYzXMbG1oXM6kb4e1feRCEIUKNFVox6sGxwIww5qwBTTueQfQ/exec';
+
+        // Swaps the form out for the confirmation panel and makes sure it is
+        // actually on screen — removing the taller signup section can otherwise
+        // leave the viewport scrolled past the confirmation entirely.
+        function showConfirmation() {
+            document.getElementById('signup').style.display = 'none';
+            document.getElementById('confirmation').style.display = 'flex';
+            document.querySelector('.mobile-sticky-cta').style.display = 'none';
+            document.getElementById('confirmation').scrollIntoView({
+                behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+                block: 'start'
             });
         }
 
-        // Handle form submission
+        // Best-effort coarse location. Capped at 2s so a slow or blocked
+        // third party can never hold up a signup.
+        async function fetchGeo() {
+            const controller = new AbortController();
+            const timer = setTimeout(function() { controller.abort(); }, 2000);
+            try {
+                const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+                if (!res.ok) return { country: '', city: '' };
+                const geo = await res.json();
+                return { country: geo.country_name || '', city: geo.city || '' };
+            } catch (e) {
+                return { country: '', city: '' };
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
         document.getElementById('signupForm').addEventListener('submit', async function(event) {
             event.preventDefault();
-            
+
             const form = event.target;
             const emailInput = document.getElementById('email');
             const submitButton = form.querySelector('.submit-button');
@@ -1214,43 +1338,35 @@
             const buttonLoading = submitButton.querySelector('.button-loading');
             const errorDiv = document.getElementById('emailError');
             const honeypot = form.querySelector('input[name="_gotcha"]');
-            
-            // Clear previous errors
+
             errorDiv.style.display = 'none';
             emailInput.classList.remove('input-error');
-            
-            // Check honeypot for spam
-            if (honeypot.value) return;
-            
+
+            // Spam trap tripped. Show the normal confirmation rather than
+            // returning silently: a bot gets no signal that it was caught, and
+            // a false positive is never left staring at a dead button.
+            if (honeypot.value) {
+                showConfirmation();
+                return;
+            }
+
             const email = emailInput.value.trim();
-            
-            // Validate email
+
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 errorDiv.textContent = 'Please enter a valid email address';
                 errorDiv.style.display = 'block';
                 emailInput.classList.add('input-error');
+                emailInput.focus();
                 return;
             }
-            
-            // Show loading state
+
             submitButton.disabled = true;
             buttonText.style.display = 'none';
             buttonLoading.style.display = 'inline';
-            
+
             try {
                 const urlParams = new URLSearchParams(window.location.search);
-
-                // Fetch geo data (non-blocking — defaults to empty if it fails)
-                var geoCountry = '';
-                var geoCity = '';
-                try {
-                    const geoRes = await fetch('https://ipapi.co/json/');
-                    if (geoRes.ok) {
-                        const geo = await geoRes.json();
-                        geoCountry = geo.country_name || '';
-                        geoCity = geo.city || '';
-                    }
-                } catch (e) {}
+                const geo = await fetchGeo();
 
                 const sheetData = {
                     email: email,
@@ -1261,17 +1377,24 @@
                     language: navigator.language || '',
                     screen: screen.width + 'x' + screen.height,
                     user_agent: navigator.userAgent || '',
-                    country: geoCountry,
-                    city: geoCity
+                    country: geo.country,
+                    city: geo.city
                 };
 
-                // Send to Google Sheets
-                await fetch('https://script.google.com/macros/s/AKfycbx9plNmHs8tbTzyqLqMGVYzXMbG1oXM6kb4e1feRCEIUKNFVox6sGxwIww5qwBTTueQfQ/exec', {
-                    method: 'POST',
-                    body: JSON.stringify(sheetData)
-                }).catch(function() {});
+                // Deliberately sent without a Content-Type header: that keeps it a
+                // CORS-simple request, so Apps Script never sees a preflight it
+                // cannot answer.
+                let delivered = true;
+                try {
+                    const res = await fetch(SHEET_ENDPOINT, {
+                        method: 'POST',
+                        body: JSON.stringify(sheetData)
+                    });
+                    delivered = res.ok;
+                } catch (e) {
+                    delivered = false;
+                }
 
-                // Fire GA4 sign_up event with traffic source info
                 gtag('event', 'sign_up', {
                     method: 'email',
                     utm_source: urlParams.get('utm_source') || '(none)',
@@ -1280,10 +1403,14 @@
                     page_referrer: document.referrer || '(direct)'
                 });
 
-                // Show confirmation screen
-                document.getElementById('signup').style.display = 'none';
-                document.getElementById('confirmation').style.display = 'flex';
-                document.querySelector('.mobile-sticky-cta').style.display = 'none';
+                // The signup is still confirmed to the visitor either way — but a
+                // failed write is recorded so lost addresses are visible in GA4
+                // instead of disappearing without trace.
+                if (!delivered) {
+                    gtag('event', 'signup_delivery_failed', { method: 'email' });
+                }
+
+                showConfirmation();
             } catch (err) {
                 errorDiv.textContent = 'Something went wrong. Please try again.';
                 errorDiv.style.display = 'block';
@@ -1294,32 +1421,28 @@
         });
 
         // Social sharing functions
-        function shareTwitter() {
-            const text = "I'm on the list to play POTUS! Get on the waitlist to join me in the situation room.";
-            const url = "https://bepotus.ai";
-            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-            window.open(twitterUrl, '_blank', 'width=600,height=400');
+        const SHARE_URL = "https://bepotus.ai";
+        const SHARE_TEXT = "I'm on the list to play POTUS! Get on the waitlist to join me in the situation room.";
+
+        function shareX() {
+            const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(SHARE_URL)}`;
+            window.open(shareUrl, '_blank', 'noopener,width=600,height=400');
         }
 
         function shareLinkedIn() {
-            const url = "https://bepotus.ai";
-            const title = "POTUS - The Presidential Decision Simulation";
-            const summary = "Every decision echoes through history. Are you ready to command the free world?";
-            const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-            window.open(linkedInUrl, '_blank', 'width=600,height=400');
+            const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(SHARE_URL)}`;
+            window.open(linkedInUrl, '_blank', 'noopener,width=600,height=400');
         }
 
         function copyLink() {
-            const url = "https://bepotus.ai";
-            
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(url).then(() => {
+                navigator.clipboard.writeText(SHARE_URL).then(() => {
                     showCopySuccess();
                 }).catch(() => {
-                    fallbackCopyLink(url);
+                    fallbackCopyLink(SHARE_URL);
                 });
             } else {
-                fallbackCopyLink(url);
+                fallbackCopyLink(SHARE_URL);
             }
         }
 
@@ -1343,79 +1466,86 @@
             document.body.removeChild(textArea);
         }
 
+        let copyResetTimer = null;
         function showCopySuccess() {
-            const copyButton = document.querySelector('.share-buttons button:nth-child(3)');
-            const originalText = copyButton.textContent;
+            const copyButton = document.getElementById('copyLinkButton');
+            if (!copyButton) return;
+            // Guard against a rapid second click resetting the label early.
+            clearTimeout(copyResetTimer);
             copyButton.textContent = 'Copied!';
             copyButton.style.background = 'var(--gold)';
             copyButton.style.color = 'var(--bg-dark)';
-            
-            setTimeout(() => {
-                copyButton.textContent = originalText;
+
+            copyResetTimer = setTimeout(() => {
+                copyButton.textContent = 'Copy Link';
                 copyButton.style.background = 'transparent';
                 copyButton.style.color = 'var(--gold)';
             }, 2000);
         }
 
-        // Show mobile sticky CTA when scrolling past hero
-        function handleScroll() {
-            const hero = document.querySelector('.hero');
-            const mobileCTA = document.querySelector('.mobile-sticky-cta');
-            const signup = document.getElementById('signup');
-            const confirmation = document.getElementById('confirmation');
-            
-            if (confirmation.style.display === 'flex') {
+        // Both scroll effects share one rAF-throttled pass. Previously each ran on
+        // every scroll event and re-queried the DOM plus read offsetTop/offsetHeight,
+        // forcing a synchronous layout many times per second on the main thread.
+        const heroEl = document.querySelector('.hero');
+        const mobileCTA = document.querySelector('.mobile-sticky-cta');
+        const signupEl = document.getElementById('signup');
+        const confirmationEl = document.getElementById('confirmation');
+        const stakesEl = document.querySelector('.stakes');
+        let ctaHideTimer = null;
+
+        function updateMobileCTA(scrollY) {
+            if (confirmationEl.style.display === 'flex') {
+                mobileCTA.classList.remove('show');
                 mobileCTA.style.display = 'none';
                 return;
             }
-            
-            const heroBottom = hero.offsetTop + hero.offsetHeight;
-            const signupTop = signup.offsetTop;
-            const scrollY = window.scrollY;
-            
-            // Only show on mobile devices
+
+            const heroBottom = heroEl.offsetTop + heroEl.offsetHeight;
+            const signupTop = signupEl.offsetTop;
             const isMobile = window.innerWidth <= 768;
-            
-            if (isMobile && scrollY > heroBottom && scrollY < signupTop - 100) {
-                mobileCTA.style.display = 'block';
-                setTimeout(() => {
-                    mobileCTA.classList.add('show');
-                }, 10);
-            } else {
+            const shouldShow = isMobile && scrollY > heroBottom && scrollY < signupTop - 100;
+
+            if (shouldShow) {
+                clearTimeout(ctaHideTimer);
+                if (mobileCTA.style.display !== 'block') {
+                    mobileCTA.style.display = 'block';
+                    // Next frame, so the transition has a start value to animate from.
+                    requestAnimationFrame(function() { mobileCTA.classList.add('show'); });
+                }
+            } else if (mobileCTA.classList.contains('show')) {
                 mobileCTA.classList.remove('show');
-                setTimeout(() => {
-                    if (!mobileCTA.classList.contains('show')) {
-                        mobileCTA.style.display = 'none';
-                    }
+                clearTimeout(ctaHideTimer);
+                ctaHideTimer = setTimeout(function() {
+                    if (!mobileCTA.classList.contains('show')) mobileCTA.style.display = 'none';
                 }, 500);
             }
         }
 
-        // Initialize scroll handler
-        window.addEventListener('scroll', handleScroll);
-        window.addEventListener('resize', handleScroll);
-        
-        // Parallax effect for stakes background
-        function handleParallax() {
-            const stakes = document.querySelector('.stakes');
-            const stakesBg = document.querySelector('.stakes::before');
-            
-            if (stakes) {
-                const scrolled = window.pageYOffset;
-                const stakesTop = stakes.offsetTop;
-                const stakesHeight = stakes.offsetHeight;
-                const windowHeight = window.innerHeight;
-                
-                // Check if stakes section is in viewport
-                if (scrolled + windowHeight > stakesTop && scrolled < stakesTop + stakesHeight) {
-                    const yPos = -((scrolled - stakesTop) * 0.1);
-                    stakes.style.setProperty('--parallax-offset', `${yPos}px`);
-                }
+        function updateParallax(scrollY) {
+            if (!stakesEl) return;
+            const stakesTop = stakesEl.offsetTop;
+            if (scrollY + window.innerHeight > stakesTop && scrollY < stakesTop + stakesEl.offsetHeight) {
+                stakesEl.style.setProperty('--parallax-offset', (-((scrollY - stakesTop) * 0.1)) + 'px');
             }
         }
-        
-        window.addEventListener('scroll', handleParallax);
-        window.addEventListener('resize', handleParallax);
+
+        let scrollTicking = false;
+        const parallaxEnabled = !prefersReducedMotion();
+
+        function onScroll() {
+            if (scrollTicking) return;
+            scrollTicking = true;
+            requestAnimationFrame(function() {
+                const scrollY = window.scrollY;
+                updateMobileCTA(scrollY);
+                if (parallaxEnabled) updateParallax(scrollY);
+                scrollTicking = false;
+            });
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
+        onScroll();
 
         // Intersection Observer for stake line animations
         const observerOptions = {
@@ -1441,45 +1571,96 @@
 
         // Lightbox carousel
         (function() {
-            const screenshots = document.querySelectorAll('.screenshot-item img');
+            const items = Array.from(document.querySelectorAll('.screenshot-item'));
             const overlay = document.getElementById('lightbox');
             const lightboxImg = document.getElementById('lightboxImage');
             const counter = document.getElementById('lightboxCounter');
-            const srcs = Array.from(screenshots).map(img => img.src);
+            const closeButton = document.getElementById('lightboxClose');
+            if (!items.length || !overlay) return;
+
+            const slides = items.map(function(item) {
+                const img = item.querySelector('img');
+                return {
+                    thumb: img.getAttribute('src'),
+                    full: img.getAttribute('data-full') || img.getAttribute('src'),
+                    alt: img.getAttribute('alt') || ''
+                };
+            });
+
             let currentIndex = 0;
+            let renderToken = 0;
+            let lastFocused = null;
+            const requested = new Set();
+
+            function preload(index) {
+                const slide = slides[index];
+                if (!slide || requested.has(slide.full)) return;
+                requested.add(slide.full);
+                new Image().src = slide.full;
+            }
+
+            function update() {
+                const slide = slides[currentIndex];
+                // Token guards against a slow full-size load from an earlier slide
+                // landing after the visitor has already navigated onward.
+                const token = ++renderToken;
+
+                // Paint the cached thumbnail immediately so the viewer is never
+                // blank, then sharpen to the full-size file once it has decoded.
+                lightboxImg.src = slide.thumb;
+                lightboxImg.alt = slide.alt;
+                counter.textContent = (currentIndex + 1) + ' / ' + slides.length;
+
+                const full = new Image();
+                full.onload = function() {
+                    if (token === renderToken) lightboxImg.src = slide.full;
+                };
+                full.src = slide.full;
+                requested.add(slide.full);
+
+                preload((currentIndex + 1) % slides.length);
+                preload((currentIndex - 1 + slides.length) % slides.length);
+            }
 
             function open(index) {
+                lastFocused = document.activeElement;
                 currentIndex = index;
                 update();
                 overlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                closeButton.focus();
             }
 
             function close() {
                 overlay.classList.remove('active');
                 document.body.style.overflow = '';
-            }
-
-            function update() {
-                lightboxImg.src = srcs[currentIndex];
-                counter.textContent = (currentIndex + 1) + ' / ' + srcs.length;
+                // Send the keyboard back where it came from instead of to page top.
+                if (lastFocused && typeof lastFocused.focus === 'function') {
+                    lastFocused.focus({ preventScroll: true });
+                }
             }
 
             function next() {
-                currentIndex = (currentIndex + 1) % srcs.length;
+                currentIndex = (currentIndex + 1) % slides.length;
                 update();
             }
 
             function prev() {
-                currentIndex = (currentIndex - 1 + srcs.length) % srcs.length;
+                currentIndex = (currentIndex - 1 + slides.length) % slides.length;
                 update();
             }
 
-            screenshots.forEach(function(img, i) {
-                img.parentElement.addEventListener('click', function() { open(i); });
+            items.forEach(function(item, i) {
+                item.addEventListener('click', function() { open(i); });
+                item.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                        e.preventDefault();
+                        open(i);
+                    }
+                });
             });
 
-            document.getElementById('lightboxClose').addEventListener('click', close);
+            closeButton.addEventListener('click', close);
             document.getElementById('lightboxNext').addEventListener('click', next);
             document.getElementById('lightboxPrev').addEventListener('click', prev);
 

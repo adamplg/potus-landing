@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Subscriber exports. These contain email addresses and IP addresses —
+# they must never be committed or deployed to the web root.
+*.csv
+submissions*
+
+# Editor / tooling noise
+.vscode/
+.idea/
+*.swp
+*~

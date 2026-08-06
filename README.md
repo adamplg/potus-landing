@@ -12,10 +12,12 @@ POTUS is an interactive leadership simulation where players step into the role o
 - **Video Teaser**: Embedded video showcasing the game experience
 - **Screenshots Gallery**: Horizontal scrollable gallery of in-game screenshots with lightbox carousel (keyboard, touch swipe, and click navigation)
 - **Key Features Display**: Highlights of voice calls, command decisions, and dynamic scenarios
-- **Email Signup**: Early access form (limited to 500 users) with Basin form backend
+- **Email Signup**: Early access form (limited to 500 users) posting to a Google Apps Script endpoint that appends to a Google Sheet
 - **Confirmation Screen**: Post-signup confirmation with social sharing options
 - **Responsive Design**: Optimized for desktop and mobile devices
+- **Accessibility**: Keyboard-navigable gallery and lightbox, visible focus states, and full `prefers-reduced-motion` support
 - **Safari-specific optimizations**: Special handling for Safari mobile performance
+- **Privacy Policy**: `privacy.html`, linked from the footer and the signup form
 
 ## Analytics & Tracking
 
@@ -24,8 +26,8 @@ POTUS is an interactive leadership simulation where players step into the role o
 
 ## Tech Stack
 
-- Pure HTML/CSS/JavaScript (no framework dependencies)
-- Basin for form handling
+- Pure HTML/CSS/JavaScript (no framework dependencies, no build step)
+- Google Apps Script → Google Sheets for form handling
 - Google Analytics 4 for tracking
 - Custom animations and parallax effects
 - Mobile-optimized with sticky CTA button
@@ -33,12 +35,31 @@ POTUS is an interactive leadership simulation where players step into the role o
 ## Assets
 
 The `attached_assets/` directory contains:
-- Background images (White House office for desktop/mobile)
-- Game screenshots (login, secure lines, CIA call, JSOC call, orders)
-- Feature icons (VOICE, DECIDE, SCENARIO)
-- POTUS seal and logos
-- Teaser video (H.264 compressed)
-- Open Graph/social media images
+- Background images (White House office for desktop/mobile) — JPEG
+- Game screenshots — WebP, in two sizes: `*_thumb.webp` (480px, shown in the gallery) and `*_full.webp` (900px, fetched only when the lightbox opens)
+- Feature icons (VOICE, DECIDE, SCENARIO) — WebP
+- POTUS seal and logos — WebP, plus PNG favicon and apple-touch-icon
+- Teaser video (H.264, faststart enabled so it streams rather than fully buffering)
+- Open Graph/social media image — kept as JPEG for maximum scraper compatibility
+
+Images are sized for roughly 2× display density. If you replace one, re-export at a
+similar pixel size rather than dropping in a full-resolution original — the previous
+set was around 10× larger than it rendered.
+
+## Local Development
+
+No build step. Serve the directory over HTTP so the form's `fetch` and clipboard
+APIs behave as they do in production:
+
+```bash
+python3 -m http.server 8000
+# then open http://localhost:8000
+```
+
+## Data Handling
+
+Subscriber exports (`*.csv`) are gitignored. They contain email addresses and IP
+addresses and must never be committed or placed in the deployed web root.
 
 ## Live Site
 
