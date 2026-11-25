@@ -18,6 +18,7 @@
   const urgent = $('mcUrgent'), micRow = $('mcMic'), micLevel = $('mcMicLevel'), micName = $('mcMicName');
   const words = $('mcWords'), transcript = $('mcTranscript'), note = $('mcNote');
   const after = $('mcAfter'), paper = $('mcPaper'), paperDate = $('mcPaperDate'), paperHeadline = $('mcPaperHeadline');
+  const paperName = $('mcPaperName'), paperDeck = $('mcPaperDeck'), paperBody = $('mcPaperBody');
   const afterLead = $('mcAfterLead'), afterForm = $('mcAfterForm'), afterEmail = $('mcAfterEmail'), again = $('mcAgain');
 
   // No microphone API or no secure connection: the block stays hidden and the page is as before.
@@ -36,7 +37,7 @@
 
   let conversation = null, generation = 0, sdkPromise = null, controller = null;
   let connectTimer = null, limitTimer = null, clockTimer = null, clockStartTimer = null, nudgeTimer = null;
-  let decided = false, headline = '', mikeTurns = 0, clockRunning = false, simTimers = [];
+  let decided = false, headline = '', page = null, mikeTurns = 0, clockRunning = false, simTimers = [];
 
   /* ---------- the ring ---------- */
   // Adam: "a buzzin like a phone vibrating on silent". Made in the browser: a low motor
@@ -155,26 +156,74 @@
   }
 
   /* ---------- the front page ---------- */
-  // Mike hands the headline over while he reads it. The page keeps it in hand and prints the
-  // paper when the line closes, in the place where the call card was, so nothing needs scrolling
-  // (Adam, 2026-11-25).
-  function keepHeadline(text) {
-    headline = shown(text).replace(/^["“‘']+|["”’']+$/g, '').slice(0, 140);
+  // Mike's model writes the whole front page during the call: which paper it is, the headline,
+  // a line under it, a reporter's name and the article. It hands them over while he reads the
+  // headline. The page keeps them in hand and prints the paper when the line closes, in the
+  // place where the call card was (Adam, 2026-11-25). Nothing here writes or changes the words;
+  // they are set as plain text, cut to a sensible length.
+  const cut = (text, max) => shown(text).replace(/^["“‘']+|["”’']+$/g, '').slice(0, max);
+  function keepFrontPage(p) {
+    p = p || {};
+    headline = cut(p.headline, 140);
+    page = {
+      paper: cut(p.paper || p.newspaper, 60) || 'The Potomac Dispatch',
+      deck: cut(p.deck || p.subhead, 220),
+      byline: cut(p.byline, 60).replace(/^by\s+/i, ''),
+      body: String(p.body || p.article || '').split(/\n\s*\n|\n/).map((x) => shown(x)).filter(Boolean).join('\n\n').slice(0, 1400),
+    };
+  }
+
+  // The sound of a sheet being printed: quick ticks while it feeds out, and a soft thud when it lands.
+  function printSound(seconds) {
+    let ctx; try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+    const t0 = ctx.currentTime + 0.03, len = Math.floor(ctx.sampleRate * 0.02);
+    const noise = ctx.createBuffer(1, len, ctx.sampleRate), d = noise.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    for (let at = 0; at < seconds; at += 0.055 + Math.random() * 0.02) {
+      const src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain();
+      src.buffer = noise; bp.type = 'bandpass'; bp.frequency.value = 2100 + Math.random() * 900; bp.Q.value = 1.4;
+      g.gain.value = 0.11 + Math.random() * 0.05;
+      src.connect(bp); bp.connect(g); g.connect(ctx.destination); src.start(t0 + at);
+    }
+    const hum = ctx.createOscillator(), hg = ctx.createGain();
+    hum.type = 'sawtooth'; hum.frequency.value = 86; hg.gain.setValueAtTime(0.018, t0); hg.gain.setValueAtTime(0.018, t0 + seconds); hg.gain.linearRampToValueAtTime(0, t0 + seconds + 0.05);
+    hum.connect(hg); hg.connect(ctx.destination); hum.start(t0); hum.stop(t0 + seconds + 0.06);
+    const thud = ctx.createOscillator(), tg = ctx.createGain();
+    thud.frequency.setValueAtTime(130, t0 + seconds); thud.frequency.exponentialRampToValueAtTime(55, t0 + seconds + 0.16);
+    tg.gain.setValueAtTime(0.0001, t0 + seconds); tg.gain.exponentialRampToValueAtTime(0.22, t0 + seconds + 0.015); tg.gain.exponentialRampToValueAtTime(0.0001, t0 + seconds + 0.22);
+    thud.connect(tg); tg.connect(ctx.destination); thud.start(t0 + seconds); thud.stop(t0 + seconds + 0.25);
+    setTimeout(() => { try { ctx.close(); } catch (e) {} }, (seconds + 0.6) * 1000);
   }
 
   function showAfter() {
     if (headline) {
       const tomorrow = new Date(Date.now() + 86400000);
       paperDate.textContent = tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      paperName.textContent = page.paper;
       paperHeadline.textContent = headline;
-      $('mcLive').textContent = 'Tomorrow’s front page, The Potomac Dispatch: ' + headline;
+      paperDeck.textContent = page.deck; paperDeck.hidden = !page.deck;
+      paperBody.replaceChildren();
+      if (page.body) {
+        if (page.byline) { const by = document.createElement('p'); by.className = 'mc-paper-byline'; by.textContent = 'By ' + page.byline; paperBody.append(by); }
+        page.body.split('\n\n').forEach((para, i) => { const el = document.createElement('p'); if (!i) el.className = 'mc-paper-first'; el.textContent = para; paperBody.append(el); });
+        const turn = document.createElement('p'); turn.className = 'mc-paper-turn'; turn.textContent = 'Continued on Page A6'; paperBody.append(turn);
+      }
+      paperBody.hidden = !page.body;
+      $('mcLive').textContent = 'Tomorrow’s front page, ' + page.paper + ': ' + headline + (page.deck ? '. ' + page.deck : '');
     }
     paper.hidden = !headline;
+    after.dataset.paper = headline ? 'yes' : 'none';
     after.hidden = false;
     card.hidden = true;
     afterLead.textContent = decided || headline ? 'That was round one.' : 'The line went dead.';
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    root.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+    if (headline) {
+      paper.classList.remove('mc-printing');
+      if (!still) { void paper.offsetWidth; paper.classList.add('mc-printing'); }
+      printSound(still ? 0.5 : 1.9);
+    }
     afterLead.focus({ preventScroll: true });
-    root.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   }
 
   /* ---------- is the microphone heard? ---------- */
@@ -268,7 +317,7 @@
     if (['asking', 'connecting', 'connected'].includes(root.dataset.state)) return;
     const token = ++generation;
     ring.stop();
-    decided = false; headline = ''; mikeTurns = 0; clockRunning = false;
+    decided = false; headline = ''; page = null; mikeTurns = 0; clockRunning = false;
     transcript.replaceChildren(); clock.hidden = true; choiceLine.hidden = true; choiceLine.textContent = ''; after.hidden = true; paper.hidden = true; card.hidden = false;
     controller = new AbortController();
     document.querySelectorAll('video,audio').forEach((m) => m.pause());
@@ -296,7 +345,8 @@
         signedUrl,
         clientTools: {
           decision_made: (p) => { if (token === generation) decisionMade(p && p.choice); return 'ok'; },
-          show_headline: (p) => { if (token === generation) keepHeadline(p && p.headline); return 'shown'; },
+          show_front_page: (p) => { if (token === generation) keepFrontPage(p); return 'shown'; },
+          show_headline: (p) => { if (token === generation && !(page && page.body)) keepFrontPage(p); return 'shown'; },
         },
         preferHeadphonesForIosDevices: true,
         connectionDelay: { default: 500, android: 2000, ios: 1500 },
@@ -331,7 +381,7 @@
     at(2, () => onMikeSpoke(token, 'Boss, it’s Mike. Sorry, there’s no good time for this. We’ve got a situation, and I need your decision in the next ninety seconds.'));
     at(8, () => onMikeSpoke(token, 'Iran has shut the strait again. Tanaka wants two destroyers in by morning. Benally wants you on the phone with their ambassador first.'));
     at(40, () => { decisionMade('A phone call to their ambassador'); onMikeSpoke(token, 'A phone call. All right. I’ll tell Tanaka to stand his ships down. He won’t thank you.'); });
-    at(55, () => { keepHeadline('President Blinks in Hormuz Standoff'); onMikeSpoke(token, 'Tomorrow’s Potomac Dispatch: “President Blinks in Hormuz Standoff.”'); });
+    at(55, () => { keepFrontPage({ paper: 'The Capitol Courier', headline: 'President Orders Pizza Summit, Senate Demands Extra Cheese', deck: 'A late-night standoff over the federal budget ends with forty boxes and one very tired Chief of Staff.', byline: 'Dana Whitlock', body: 'WASHINGTON — The President ended a nine-hour budget standoff on Tuesday night by ordering forty pizzas to the Senate floor, a decision aides described as “decisive, and slightly greasy.”\n\nSenators from both parties, who had refused to speak to one another since noon, were seen sharing a table by eleven. A vote followed within the hour.\n\nThe Chief of Staff, Mike Brannigan, declined to say who would pay. “We are looking into it,” he said, and left.' }); onMikeSpoke(token, 'Tomorrow’s front page of The Capitol Courier: “President Orders Pizza Summit, Senate Demands Extra Cheese.”'); });
     at(70, () => finish('ended'));
   }
 
@@ -340,7 +390,7 @@
   decline.addEventListener('click', () => { ring.stop(); setState('declined'); answer.focus({ preventScroll: true }); });
   hangup.addEventListener('click', () => finish(root.dataset.state === 'connected' ? 'ended' : 'idle'));
   again.addEventListener('click', () => {
-    after.hidden = true; paper.hidden = true; clock.hidden = true; transcript.replaceChildren(); headline = '';
+    after.hidden = true; paper.hidden = true; clock.hidden = true; transcript.replaceChildren(); headline = ''; page = null;
     setState('idle');
     root.scrollIntoView({ block: 'start' });
     answer.focus({ preventScroll: true });

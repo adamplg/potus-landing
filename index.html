@@ -70,7 +70,7 @@
     <!-- Fonts with font-display swap for better performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,400&display=swap">
 
     <style>
         * {
@@ -1070,7 +1070,7 @@
 
         /* Mike's call (local build, 2026-11-25) */
         .mike-call {
-            max-width: 680px;
+            max-width: 960px;
             margin: 24px auto 0;
             scroll-margin-top: 40px;
         }
@@ -1113,12 +1113,6 @@
         }
 
         .mc-scenario:disabled { opacity: 0.45; cursor: default; }
-
-        .mc-after {
-            max-width: 560px;
-            margin-left: auto;
-            margin-right: auto;
-        }
 
         /* The call card, after the game's own incoming-call screen (Adam, 2026-11-25):
            a dark rounded card, the caller's portrait in green rings, round red and green keys. */
@@ -1384,28 +1378,51 @@
             opacity: 0.85;
         }
 
-        /* The front page. An invented paper in the page's own type: it must not
-           look like any real one. */
-        .mc-paper {
-            background: #E8E1CF;
-            color: #1B1A17;
-            padding: 26px 26px 22px;
-            text-align: center;
-            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
-            animation: mcPrint 0.7s ease-out;
+        /* Tomorrow's front page (Adam, 2026-11-25: "make it look a bit more like a real newspaper").
+           The paper's name, the headline and the whole article are written by Mike's model during
+           the call; this only sets them. It feeds out like a sheet from a printer when the line closes. */
+        .mc-after {
+            max-width: 940px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 580px) minmax(0, 300px);
+            gap: 44px;
+            align-items: center;
+            justify-content: center;
+            text-align: left;
         }
 
+        .mc-after[data-paper="none"] { grid-template-columns: minmax(0, 420px); text-align: center; }
+
+        .mc-paper {
+            overflow: hidden;
+            box-shadow: 0 22px 60px rgba(0, 0, 0, 0.6);
+            background: #1B1A17;
+        }
+
+        .mc-paper-sheet {
+            background:
+                radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.5), transparent 60%),
+                #EAE3D0;
+            color: #1A1917;
+            padding: 22px 26px 24px;
+            text-align: center;
+        }
+
+        .mc-paper.mc-printing .mc-paper-sheet { animation: mcPrint 1.9s steps(22, end) both; }
+
         @keyframes mcPrint {
-            from { opacity: 0; transform: translateY(18px); }
-            to { opacity: 1; transform: none; }
+            from { clip-path: inset(0 0 100% 0); transform: translateY(-22px); }
+            to { clip-path: inset(0 0 0 0); transform: none; }
         }
 
         .mc-paper-name {
-            font-family: var(--font-hero);
-            font-size: 38px;
-            font-weight: 600;
+            font-family: 'Playfair Display', var(--font-hero);
+            font-weight: 900;
+            font-size: 40px;
             line-height: 1;
-            letter-spacing: 0.5px;
+            letter-spacing: -0.5px;
+            text-wrap: balance;
         }
 
         .mc-paper-line {
@@ -1413,42 +1430,78 @@
             justify-content: space-between;
             gap: 12px;
             margin-top: 12px;
-            padding: 6px 0;
-            border-top: 2px solid #1B1A17;
-            border-bottom: 1px solid #1B1A17;
-            font-size: 11px;
-            letter-spacing: 1.5px;
+            padding: 5px 0;
+            border-top: 3px double #1A1917;
+            border-bottom: 1px solid #1A1917;
+            font-family: var(--font-body);
+            font-size: 10.5px;
+            font-weight: 500;
+            letter-spacing: 1.4px;
             text-transform: uppercase;
         }
 
         .mc-paper-headline {
-            font-family: var(--font-hero);
-            font-size: 44px;
-            font-weight: 600;
-            line-height: 1.05;
-            margin: 22px 0 20px;
+            font-family: 'Playfair Display', var(--font-hero);
+            font-weight: 900;
+            font-size: 38px;
+            line-height: 1.06;
+            margin: 20px 0 10px;
             text-wrap: balance;
         }
 
-        .mc-paper-columns {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+        .mc-paper-deck {
+            font-family: 'Playfair Display', var(--font-hero);
+            font-style: italic;
+            font-weight: 400;
+            font-size: 17px;
+            line-height: 1.35;
+            margin: 0 auto 14px;
+            max-width: 30em;
+            text-wrap: balance;
         }
 
-        .mc-paper-columns span {
-            height: 44px;
-            background: repeating-linear-gradient(to bottom, rgba(27, 26, 23, 0.32) 0 2px, transparent 2px 9px);
+        .mc-paper-body {
+            columns: 2;
+            column-gap: 22px;
+            column-rule: 1px solid rgba(26, 25, 23, 0.35);
+            border-top: 1px solid #1A1917;
+            padding-top: 12px;
+            text-align: justify;
+            hyphens: auto;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 13.5px;
+            line-height: 1.5;
         }
 
-        .mc-after { margin-top: 8px; }
+        .mc-paper-body p { margin: 0 0 8px; text-indent: 1.2em; }
+        .mc-paper-body p.mc-paper-byline {
+            text-indent: 0;
+            text-align: left;
+            font-family: var(--font-body);
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .mc-paper-body p.mc-paper-first { text-indent: 0; }
+        .mc-paper-body p.mc-paper-first::first-letter {
+            font-family: 'Playfair Display', var(--font-hero);
+            font-weight: 900;
+            font-size: 3.1em;
+            line-height: 0.82;
+            float: left;
+            padding: 4px 6px 0 0;
+        }
+        .mc-paper-body p.mc-paper-turn { text-indent: 0; text-align: right; font-style: italic; margin: 0; }
+
         .mc-after-lead {
             font-family: var(--font-hero);
-            font-size: 32px;
-            margin-top: 34px;
+            font-size: 34px;
+            line-height: 1.1;
             outline: none;
         }
-        .mc-after-line { font-size: 17px; font-weight: 300; margin-top: 6px; }
+        .mc-after-line { font-size: 17px; font-weight: 300; margin-top: 8px; }
         .mc-after-form { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
         .mc-after-form input {
             font: inherit;
@@ -1462,7 +1515,8 @@
         .mc-again {
             font: inherit;
             font-size: 15px;
-            margin-top: 22px;
+            margin-top: 20px;
+            padding: 0;
             background: none;
             border: 0;
             color: var(--gold);
@@ -1471,20 +1525,25 @@
             cursor: pointer;
         }
 
+        @media (max-width: 900px) {
+            .mc-after { grid-template-columns: minmax(0, 580px); gap: 28px; text-align: center; }
+        }
+
         @media (max-width: 768px) {
             .mc-who { font-size: 26px; }
             .mc-clock-time { font-size: 46px; }
             .mc-actions { gap: 36px; }
-            .mc-paper { padding: 22px 16px 18px; }
+            .mc-paper-sheet { padding: 18px 16px 18px; }
             .mc-paper-name { font-size: 28px; }
-            .mc-paper-headline { font-size: 32px; }
-            .mc-paper-line { font-size: 10px; letter-spacing: 1px; }
-            .mc-paper-line span:last-child { display: none; }
-            .mc-paper-line { justify-content: space-around; }
+            .mc-paper-headline { font-size: 27px; }
+            .mc-paper-deck { font-size: 15px; }
+            .mc-paper-line { font-size: 9.5px; letter-spacing: 1px; }
+            .mc-paper-line span:first-child { display: none; }
+            .mc-paper-body { column-gap: 16px; font-size: 12.5px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .mc-paper, .mc-card.mc-buzzing, .mc-avatar::before, .mc-avatar::after { animation: none !important; }
+            .mc-paper.mc-printing .mc-paper-sheet, .mc-card.mc-buzzing, .mc-avatar::before, .mc-avatar::after { animation: none !important; }
         }
 
         /* Error States */
@@ -1625,11 +1684,15 @@
 
                     <div class="mc-after" id="mcAfter" hidden>
                         <article class="mc-paper" id="mcPaper" hidden aria-label="Tomorrow’s front page">
-                            <p class="mc-paper-name">The Potomac Dispatch</p>
-                            <p class="mc-paper-line"><span id="mcPaperDate"></span><span>Washington</span><span>Late edition</span></p>
-                            <h3 class="mc-paper-headline" id="mcPaperHeadline"></h3>
-                            <div class="mc-paper-columns" aria-hidden="true"><span></span><span></span><span></span></div>
+                            <div class="mc-paper-sheet" id="mcPaperSheet">
+                                <p class="mc-paper-name" id="mcPaperName"></p>
+                                <p class="mc-paper-line"><span>Washington</span><span id="mcPaperDate"></span><span>Late Edition</span></p>
+                                <h3 class="mc-paper-headline" id="mcPaperHeadline"></h3>
+                                <p class="mc-paper-deck" id="mcPaperDeck"></p>
+                                <div class="mc-paper-body" id="mcPaperBody"></div>
+                            </div>
                         </article>
+                        <div class="mc-after-side">
                         <p class="mc-after-lead" id="mcAfterLead" tabindex="-1">That was round one.</p>
                         <p class="mc-after-line">The full game is for iPhone.</p>
                         <form class="mc-after-form" id="mcAfterForm" novalidate>
@@ -1638,6 +1701,7 @@
                         </form>
                         <p class="mc-after-small">Join the waitlist and we’ll tell you when POTUS launches.</p>
                         <button type="button" class="mc-again" id="mcAgain">Take the call again</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2161,6 +2225,6 @@
             }, { passive: true });
         })();
     </script>
-    <script src="/js/mike-call.js?v=local-16" defer></script>
+    <script src="/js/mike-call.js?v=local-17" defer></script>
 </body>
 </html>
