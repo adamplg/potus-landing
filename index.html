@@ -191,6 +191,12 @@
             overflow: hidden;
         }
 
+        /* ElevenLabs Grants: their white logo, unchanged, centred under the button
+           (Stella's spec, 2026-11-25): 200 px, 160 px on a phone, 28 px above. */
+        .hero-grant { display: block; width: max-content; margin: 28px auto 0; line-height: 0; }
+        .hero-grant img { display: block; width: 200px; height: auto; }
+        @media (max-width: 768px) { .hero-grant img { width: 160px; } }
+
         .cta-button:hover {
             background: var(--gold);
             color: var(--bg-dark);
@@ -1665,6 +1671,7 @@
             <h1 class="hero-title">WANT TO BE THE PRESIDENT?</h1>
             <p class="hero-subtitle">A real-time political simulation. Make the calls. Face the consequences.</p>
             <button class="cta-button" onclick="scrollToSignup()">GET EARLY ACCESS</button>
+            <a class="hero-grant" href="https://elevenlabs.io/startup-grants" target="_blank" rel="noopener"><img src="https://eleven-public-cdn.elevenlabs.io/payloadcms/cy7rxce8uki-IIElevenLabsGrants%201.webp" alt="ElevenLabs Grants" width="200" height="18" decoding="async"></a>
         </div>
         <div class="scroll-hint">
             <div class="scroll-arrow"></div>
