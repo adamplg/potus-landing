@@ -1137,13 +1137,25 @@
             .duo.duo-two {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                align-items: center;
+                align-items: start;
                 max-width: 1180px;
                 margin: 0 auto;
             }
 
             .duo.duo-two .mike-section,
             .duo.duo-two .video-section { padding: 96px 0; }
+
+            /* Balanced (Adam, 2026-11-25): the card and the tile the same height, their tops level.
+               The card drops by the teaser's heading (its line plus its margin), and the tile
+               grows to the card's height. */
+            .duo.duo-two .video-title { font-size: 36px; line-height: 1.6; margin-bottom: 40px; white-space: nowrap; }
+            .duo.duo-two:not(.duo-after) .mike-call::before {
+                content: "";
+                display: block;
+                height: calc(36px * 1.6 + 40px);
+            }
+            .duo.duo-two .video-wrapper.teaser-tile { --tile: 460px; }
+            .duo.duo-two .mc-card { min-height: 460px; }
 
             .duo.duo-two.duo-after { grid-template-columns: 1fr; }
             .duo.duo-two.duo-after .video-section { padding-top: 0; }
