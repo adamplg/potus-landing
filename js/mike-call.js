@@ -1,4 +1,4 @@
-/* Mike's call (local build, 2026-11-25).
+/* Mike's call (2026-11-25).
    The phone rings on the page; the visitor answers; Mike drops them into a
    crisis; the page counts down the deadline he names, prints tomorrow's front
    page as he reads the headline, and offers the waitlist when the line goes dead.
@@ -88,7 +88,7 @@
   })();
 
   // The app's own sounds (Marshall): the call-connected sound as the pick-up, and a click when the line closes.
-  const sounds = { pickup: '/attached_assets/mike/establishedSound.m4a', out: '/attached_assets/mike/comms-click-out.wav' };
+  const sounds = { pickup: '/attached_assets/mike/pickup.m4a', out: '/attached_assets/mike/line-closed.m4a' };
   function play(name) {
     try { const a = new Audio(sounds[name]); a.volume = 0.7; const p = a.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
   }
