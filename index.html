@@ -13,7 +13,7 @@
       gtag('js', new Date());
       gtag('config', 'G-0BL7606XB8');
     </script>
-    <meta name="description" content="Step into the Oval Office. Make real-time decisions through voice calls with AI advisors. Every choice shapes history. Join the waitlist.">
+    <meta name="description" content="Step into the Oval Office. Make real-time decisions through voice calls with AI advisors. Every choice shapes history. Join 500 early access players.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="attached_assets/potus_favicon.png">
@@ -52,7 +52,13 @@
         "url": "https://bepotus.ai",
         "description": "An AI-powered presidential decision simulation where you make real-time decisions through voice calls with AI advisors.",
         "applicationCategory": "GameApplication",
-        "operatingSystem": "iOS",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/PreOrder"
+        },
         "creator": {
             "@type": "Organization",
             "name": "Stratara AI",
@@ -165,22 +171,10 @@
 
         .hero-subtitle {
             font-size: 24px;
-            margin-bottom: 16px;
+            margin-bottom: 48px;
             opacity: 0.9;
             font-weight: 300;
             text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55);
-        }
-
-        /* Platform and stage, said once under the subtitle (2026-11-25). It takes
-           the space the subtitle's bottom margin used to hold. */
-        .hero-note {
-            font-size: 15px;
-            margin-bottom: 44px;
-            font-weight: 400;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            opacity: 0.85;
-            text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
         }
 
         .cta-button {
@@ -552,16 +546,7 @@
         .signup-box h2 {
             font-family: var(--font-hero);
             font-size: 32px;
-            margin-bottom: 14px;
-        }
-
-        /* How many are waiting, under the heading; it takes the heading's old
-           bottom margin (2026-11-25). */
-        .signup-count {
-            font-size: 16px;
-            font-weight: 300;
-            opacity: 0.9;
-            margin-bottom: 40px;
+            margin-bottom: 48px;
         }
 
         #signupForm {
@@ -947,11 +932,6 @@
                 font-size: 18px;
             }
 
-            .hero-note {
-                font-size: 13px;
-                margin-bottom: 20px;
-            }
-
             .cta-button {
                 padding: 16px 32px;
                 font-size: 16px;
@@ -1109,7 +1089,6 @@
         <div class="hero-content">
             <h1 class="hero-title">WANT TO BE THE PRESIDENT?</h1>
             <p class="hero-subtitle">A real-time political simulation. Make the calls. Face the consequences.</p>
-            <p class="hero-note">For iPhone · in private testing</p>
             <button class="cta-button" onclick="scrollToSignup()">GET EARLY ACCESS</button>
         </div>
         <div class="scroll-hint">
@@ -1196,7 +1175,7 @@
     <section class="stakes">
         <div class="container">
             <div class="stakes-content">
-                <p class="stake-line">When Mike calls you 'Mr. President' or 'Madam President,' you'll feel the weight of it.</p>
+                <p class="stake-line">When Mike calls you 'Mr. President,' you'll feel the weight of it.</p>
                 <p class="stake-line">Your enemies can turn into allies, and your allies can turn their backs - it all depends on your diplomacy skills.</p>
                 <p class="stake-line">When you say "Get me General Tanaka on the line", you'll feel what it's like to command the mightiest army on earth.</p>
             </div>
@@ -1207,8 +1186,7 @@
     <section class="signup" id="signup">
         <div class="container">
             <div class="signup-box">
-                <h2>The first 500 on the waitlist get exclusive early access.</h2>
-                <p class="signup-count">More than 2,000 people are already waiting.</p>
+                <h2>Join the first 500 to get exclusive early access.</h2>
                 <form id="signupForm" novalidate>
                     <input
                         type="email"
@@ -1247,7 +1225,7 @@
                 </div>
                 <h2>CONFIRMED</h2>
                 <p class="confirmation-message">You're on the list, future President.</p>
-                <p class="confirmation-submessage">We'll brief you by email when POTUS launches.</p>
+                <p class="confirmation-submessage">Check your email for your security clearance.<br>We'll brief you when POTUS launches.</p>
                 <div class="share-section">
                     <p>SHARE YOUR AMBITION</p>
                     <div class="share-buttons">
@@ -1425,7 +1403,7 @@
                 // they're on a list they aren't on.
                 if (!delivered) {
                     gtag('event', 'signup_delivery_failed', { method: 'email' });
-                    errorDiv.textContent = "We couldn't save your address just now. Please try again in a moment.";
+                    errorDiv.textContent = 'Something went wrong. Please try again.';
                     errorDiv.style.display = 'block';
                     submitButton.disabled = false;
                     buttonText.style.display = 'inline';
