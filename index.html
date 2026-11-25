@@ -1599,12 +1599,6 @@
                 <p class="stake-line">When you say "Get me General Tanaka on the line", you'll feel what it's like to command the mightiest army on earth.</p>
                 <!-- Mike's call (local build, 2026-11-25). Hidden until js/mike-call.js finds a microphone API. -->
                 <div class="mike-call" id="mike" data-state="idle" hidden>
-                    <div class="mc-scenarios" role="group" aria-labelledby="mcScenariosLabel">
-                        <p class="mc-label" id="mcScenariosLabel">Tonight’s situations</p>
-                        <div class="mc-scenario-list" id="mcScenarioList"></div>
-                        <p class="mc-teaser" id="mcTeaser"></p>
-                    </div>
-
                     <!-- The call card follows the game's own incoming-call screen. -->
                     <div class="mc-card" id="mcCard">
                         <div class="mc-avatar" id="mcAvatar"><img src="/attached_assets/mike/mike-brannigan.jpg" alt="" width="96" height="96"></div>
@@ -1612,7 +1606,6 @@
                         <p class="mc-who">Mike Brannigan</p>
                         <p class="mc-role">Chief of Staff</p>
                         <p class="mc-urgent" id="mcUrgent"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg><span>Urgent matter</span></p>
-                        <p class="mc-situation" id="mcSituation"></p>
                         <p class="mc-clock" id="mcClock" aria-hidden="true" hidden><span class="mc-clock-label" id="mcClockLabel">Decision in</span><span class="mc-clock-time" id="mcClockTime">1:30</span></p>
                         <p class="mc-choice" id="mcChoice" hidden></p>
                         <p class="mc-mic" id="mcMic" aria-hidden="true" hidden><span class="mc-mic-label">Your microphone</span><span class="mc-mic-bar"><span id="mcMicLevel"></span></span></p>
@@ -1644,7 +1637,7 @@
                             <button type="submit" class="submit-button">GET EARLY ACCESS</button>
                         </form>
                         <p class="mc-after-small">Join the waitlist and we’ll tell you when POTUS launches.</p>
-                        <button type="button" class="mc-again" id="mcAgain">Take another call</button>
+                        <button type="button" class="mc-again" id="mcAgain">Take the call again</button>
                     </div>
                 </div>
             </div>
@@ -2168,6 +2161,6 @@
             }, { passive: true });
         })();
     </script>
-    <script src="/js/mike-call.js?v=local-13" defer></script>
+    <script src="/js/mike-call.js?v=local-14" defer></script>
 </body>
 </html>

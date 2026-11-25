@@ -12,7 +12,7 @@
   const root = document.getElementById('mike');
   if (!root) return;
   const $ = (id) => document.getElementById(id);
-  const list = $('mcScenarioList'), eyebrow = $('mcEyebrow'), situation = $('mcSituation'), teaser = $('mcTeaser'), choiceLine = $('mcChoice');
+  const eyebrow = $('mcEyebrow'), choiceLine = $('mcChoice');
   const clock = $('mcClock'), clockLabel = $('mcClockLabel'), clockTime = $('mcClockTime');
   const status = $('mcStatus'), answer = $('mcAnswer'), hangup = $('mcHangup'), decline = $('mcDecline');
   const answerWrap = $('mcAnswerWrap'), hangupWrap = $('mcHangupWrap'), declineWrap = $('mcDeclineWrap'), answerLabel = $('mcAnswerLabel'), hangupLabel = $('mcHangupLabel');
@@ -25,15 +25,9 @@
   if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.WebSocket) return;
   root.hidden = false;
 
-  /* Marshall's situations (2026-11-25): the game's own scenarios cut down to ninety
-     seconds. The id goes to the agent as crisis_id; each crisis's full text lives
-     in the agent, never here. */
-  const SCENARIOS = [
-    { id: 'hormuz', title: 'The Hormuz Deadline', place: 'Strait of Hormuz · 04:10 local', line: 'Iran shut the strait, with two of our tankers behind their gunboats.' },
-    { id: 'taiwan', title: 'Invasion of Taiwan', place: 'Taiwan Strait · 05:40 local', line: 'China’s fleet left port. Beijing swears it’s an exercise.' },
-    { id: 'warhead', title: 'Loose Warhead', place: 'Islamabad · 02:15 local', line: 'A coup in Pakistan, and a nuclear warhead is lost.' },
-    { id: 'berlin', title: 'Agent in Jeopardy', place: 'Berlin · 23:30 local', line: 'One of our spies caught in Berlin, holding something she shouldn’t.' },
-  ];
+  /* One scenario (Adam, 2026-11-25: "Let's make it one scenario and make it simple and good").
+     Its id goes to the agent as crisis_id; the crisis's text lives in the agent, never here. */
+  const CRISIS_ID = 'hormuz';
 
   const DEADLINE = 90;   // seconds; the number Mike names
   const STILL_NO_ANSWER = 12; // seconds after the clock-out before the second bracketed line
@@ -42,7 +36,7 @@
   const localhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   const SIM = localhost && params.has('mikesim'); // a pretend call, for checking the page without placing one
 
-  let chosen = 0, conversation = null, generation = 0, sdkPromise = null, controller = null;
+  let conversation = null, generation = 0, sdkPromise = null, controller = null;
   let connectTimer = null, limitTimer = null, clockTimer = null, clockStartTimer = null, nudgeTimer = null;
   let decided = false, headline = '', mikeTurns = 0, clockRunning = false, simTimers = [];
 
@@ -105,23 +99,6 @@
   // In expressive mode his text carries performance cues like [brisk]; they shape the voice and are never shown.
   const shown = (text) => String(text || '').replace(/\[[^\]]*\]/g, ' ').replace(/\s{2,}/g, ' ').trim();
 
-  function renderScenarios() {
-    list.replaceChildren(...SCENARIOS.map((sc, i) => {
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'mc-scenario'; b.textContent = sc.title;
-      b.setAttribute('aria-pressed', String(i === chosen));
-      b.addEventListener('click', () => { if (root.dataset.state !== 'idle') setState('idle'); choose(i); ring.start(); });
-      return b;
-    }));
-  }
-
-  function choose(i) {
-    chosen = i;
-    [...list.children].forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
-    situation.textContent = SCENARIOS[i].place;
-    teaser.textContent = SCENARIOS[i].line;
-  }
-
   function setState(state, message) {
     root.dataset.state = state;
     if (state !== 'connected') delete root.dataset.mode;
@@ -135,10 +112,9 @@
     hangupLabel.textContent = state === 'connected' ? 'Hang up' : 'Cancel';
     urgent.hidden = state !== 'idle';
     note.hidden = active || state === 'ended';
-    [...list.children].forEach((b) => { b.disabled = active; });
     words.hidden = state !== 'connected' && !(state === 'ended' && transcript.childElementCount);
     if (state !== 'connected') { clock.hidden = true; choiceLine.hidden = true; micRow.hidden = true; }
-    teaser.hidden = active || state === 'ended';
+    card.hidden = state === 'ended' && !after.hidden; // the paper takes the card's place
     if (active) hangup.focus({ preventScroll: true });
   }
 
@@ -181,26 +157,26 @@
   }
 
   /* ---------- the front page ---------- */
-  function printHeadline(text) {
+  // Mike hands the headline over while he reads it. The page keeps it in hand and prints the
+  // paper when the line closes, in the place where the call card was, so nothing needs scrolling
+  // (Adam, 2026-11-25).
+  function keepHeadline(text) {
     headline = shown(text).replace(/^["“‘']+|["”’']+$/g, '').slice(0, 140);
-    if (!headline) return;
-    const tomorrow = new Date(Date.now() + 86400000);
-    paperDate.textContent = tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-    paperHeadline.textContent = headline;
-    after.hidden = false; paper.hidden = false;
-    afterLead.hidden = true; afterForm.hidden = true; again.hidden = true;
-    after.querySelectorAll('.mc-after-line, .mc-after-small').forEach((e) => { e.hidden = true; });
-    $('mcLive').textContent = 'Tomorrow’s front page, The Potomac Dispatch: ' + headline;
   }
 
   function showAfter() {
-    after.hidden = false;
+    if (headline) {
+      const tomorrow = new Date(Date.now() + 86400000);
+      paperDate.textContent = tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      paperHeadline.textContent = headline;
+      $('mcLive').textContent = 'Tomorrow’s front page, The Potomac Dispatch: ' + headline;
+    }
     paper.hidden = !headline;
-    afterLead.hidden = false; afterForm.hidden = false; again.hidden = false;
-    after.querySelectorAll('.mc-after-line, .mc-after-small').forEach((e) => { e.hidden = false; });
+    after.hidden = false;
+    card.hidden = true;
     afterLead.textContent = decided || headline ? 'That was round one.' : 'The line went dead.';
     afterLead.focus({ preventScroll: true });
-    (headline ? paper : afterLead).scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+    root.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   }
 
   /* ---------- is the microphone heard? ---------- */
@@ -293,7 +269,7 @@
     const token = ++generation;
     ring.stop();
     decided = false; headline = ''; mikeTurns = 0; clockRunning = false;
-    transcript.replaceChildren(); clock.hidden = true; choiceLine.hidden = true; choiceLine.textContent = ''; after.hidden = true; paper.hidden = true;
+    transcript.replaceChildren(); clock.hidden = true; choiceLine.hidden = true; choiceLine.textContent = ''; after.hidden = true; paper.hidden = true; card.hidden = false;
     controller = new AbortController();
     document.querySelectorAll('video,audio').forEach((m) => m.pause());
     setState('asking');
@@ -318,10 +294,10 @@
 
       const session = await window.client.Conversation.startSession({
         signedUrl,
-        dynamicVariables: { crisis_id: SCENARIOS[chosen].id },
+        dynamicVariables: { crisis_id: CRISIS_ID },
         clientTools: {
           decision_made: (p) => { if (token === generation) decisionMade(p && p.choice); return 'ok'; },
-          show_headline: (p) => { if (token === generation) printHeadline(p && p.headline); return 'shown'; },
+          show_headline: (p) => { if (token === generation) keepHeadline(p && p.headline); return 'shown'; },
         },
         preferHeadphonesForIosDevices: true,
         connectionDelay: { default: 500, android: 2000, ios: 1500 },
@@ -356,7 +332,7 @@
     at(2, () => onMikeSpoke(token, 'Boss, it’s Mike. Sorry, there’s no good time for this. We’ve got a situation, and I need your decision in the next ninety seconds.'));
     at(8, () => onMikeSpoke(token, 'Iran has shut the strait again. Tanaka wants two destroyers in by morning. Benally wants you on the phone with their ambassador first.'));
     at(40, () => { decisionMade('A phone call to their ambassador'); onMikeSpoke(token, 'A phone call. All right. I’ll tell Tanaka to stand his ships down. He won’t thank you.'); });
-    at(55, () => { printHeadline('President Blinks in Hormuz Standoff'); onMikeSpoke(token, 'Tomorrow’s Potomac Dispatch: “President Blinks in Hormuz Standoff.”'); });
+    at(55, () => { keepHeadline('President Blinks in Hormuz Standoff'); onMikeSpoke(token, 'Tomorrow’s Potomac Dispatch: “President Blinks in Hormuz Standoff.”'); });
     at(70, () => finish('ended'));
   }
 
@@ -365,10 +341,9 @@
   decline.addEventListener('click', () => { ring.stop(); setState('declined'); answer.focus({ preventScroll: true }); });
   hangup.addEventListener('click', () => finish(root.dataset.state === 'connected' ? 'ended' : 'idle'));
   again.addEventListener('click', () => {
-    after.hidden = true; paper.hidden = true; clock.hidden = true; transcript.replaceChildren();
-    choose((chosen + 1) % SCENARIOS.length);
+    after.hidden = true; paper.hidden = true; clock.hidden = true; transcript.replaceChildren(); headline = '';
     setState('idle');
-    root.scrollIntoView({ block: 'center' });
+    root.scrollIntoView({ block: 'start' });
     answer.focus({ preventScroll: true });
   });
   // The sign-up under the front page hands the address to the page's own form, so there is one path for a sign-up.
@@ -384,7 +359,21 @@
   // On this Mac only: lets a test type a line as the caller, to check the page end to end without a voice.
   if (localhost) window.__mikeSay = (text) => { try { if (conversation && conversation.sendUserMessage) conversation.sendUserMessage(String(text)); } catch (e) {} };
 
-  renderScenarios();
-  choose(0);
   setState('idle');
+
+  // The phone buzzes once when the card comes into view. A browser lets a page make sound only
+  // after the visitor has pressed or typed something on it; until then the rings pulse in silence.
+  let rang = false, inView = false;
+  const maybeRing = () => {
+    if (rang || !inView || root.dataset.state !== 'idle') return;
+    if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
+    rang = true; ring.start();
+  };
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      inView = entries[0].isIntersecting;
+      if (inView) maybeRing(); else ring.stop();
+    }, { threshold: 0.6 }).observe(card);
+    ['pointerdown', 'keydown'].forEach((type) => window.addEventListener(type, () => setTimeout(maybeRing, 0), { passive: true }));
+  }
 })();
