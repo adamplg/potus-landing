@@ -15,7 +15,7 @@
   const clock = $('mcClock'), clockLabel = $('mcClockLabel'), clockTime = $('mcClockTime');
   const status = $('mcStatus'), answer = $('mcAnswer'), hangup = $('mcHangup'), decline = $('mcDecline');
   const answerWrap = $('mcAnswerWrap'), hangupWrap = $('mcHangupWrap'), declineWrap = $('mcDeclineWrap'), answerLabel = $('mcAnswerLabel'), hangupLabel = $('mcHangupLabel');
-  const urgent = $('mcUrgent'), micRow = $('mcMic'), micLevel = $('mcMicLevel');
+  const urgent = $('mcUrgent'), micRow = $('mcMic'), micLevel = $('mcMicLevel'), micName = $('mcMicName');
   const words = $('mcWords'), transcript = $('mcTranscript'), note = $('mcNote');
   const after = $('mcAfter'), paper = $('mcPaper'), paperDate = $('mcPaperDate'), paperHeadline = $('mcPaperHeadline');
   const afterLead = $('mcAfterLead'), afterForm = $('mcAfterForm'), afterEmail = $('mcAfterEmail'), again = $('mcAgain');
@@ -184,6 +184,8 @@
   function watchMic(token) {
     let peak = 0; const began = Date.now(); let warned = false;
     micRow.hidden = false; micLevel.style.width = '0';
+    // Name the microphone the browser chose: a wrong one (a virtual device, say) is then seen at a glance.
+    micName.textContent = micLabel ? micLabel.replace(/\s*\([^)]*\)\s*$/, '') : 'Your microphone';
     clearInterval(micTimer);
     micTimer = setInterval(() => {
       if (token !== generation || !conversation || !conversation.getInputVolume) return;
