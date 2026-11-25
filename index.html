@@ -1114,16 +1114,26 @@
 
         .mc-scenario:disabled { opacity: 0.45; cursor: default; }
 
-        .mc-card, .mc-after {
+        .mc-after {
             max-width: 560px;
             margin-left: auto;
             margin-right: auto;
         }
 
+        /* The call card, after the game's own incoming-call screen (Adam, 2026-11-25):
+           a dark rounded card, the caller's portrait in green rings, round red and green keys. */
         .mc-card {
-            background: rgba(13, 17, 23, 0.82);
-            border: 1px solid rgba(205, 146, 24, 0.55);
-            padding: 36px 28px 32px;
+            --call-green: #74C46E;
+            --call-red: #CE544D;
+            --call-amber: #E3A33A;
+            --call-grey: #A3ABB5;
+            max-width: 360px;
+            margin: 0 auto;
+            padding: 34px 26px 28px;
+            background: #1B1F26;
+            border-radius: 26px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+            font-family: var(--font-body);
         }
 
         /* The card shivers with each buzz of the ring: two buzzes, as the sound does. */
@@ -1135,70 +1145,111 @@
             6%, 14%, 22%, 30%, 38%, 64%, 72%, 80%, 88%, 96% { transform: translateX(1.5px) rotate(0.15deg); }
         }
 
-        .mc-eyebrow {
-            font-size: 13px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--gold);
-            margin-bottom: 18px;
+        .mc-avatar {
+            position: relative;
+            width: 96px;
+            height: 96px;
+            margin: 14px auto 30px;
         }
 
-        .mc-dot {
-            display: inline-block;
-            width: 9px;
-            height: 9px;
+        .mc-avatar img {
+            position: relative;
+            display: block;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
-            background: var(--gold);
-            margin-right: 10px;
-            vertical-align: 1px;
-            animation: mcPulse 1.6s ease-in-out infinite;
+            object-fit: cover;
+            border: 3px solid var(--call-green);
         }
 
-        .mike-call[data-state="connected"] .mc-dot,
-        .mike-call[data-state="ended"] .mc-dot { animation: none; }
-
-        @keyframes mcPulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(205, 146, 24, 0.55); }
-            50% { opacity: 0.55; box-shadow: 0 0 0 9px rgba(205, 146, 24, 0); }
+        /* Two soft rings behind the portrait; they breathe while the phone rings and while Mike speaks. */
+        .mc-avatar::before,
+        .mc-avatar::after {
+            content: "";
+            position: absolute;
+            inset: -13px;
+            border-radius: 50%;
+            background: rgba(116, 196, 110, 0.16);
         }
+
+        .mc-avatar::after { inset: -26px; background: rgba(116, 196, 110, 0.08); }
+
+        .mike-call[data-state="idle"] .mc-avatar::before,
+        .mike-call[data-state="idle"] .mc-avatar::after,
+        .mike-call[data-state="connected"][data-mode="speaking"] .mc-avatar::before,
+        .mike-call[data-state="connected"][data-mode="speaking"] .mc-avatar::after {
+            animation: mcRing 1.8s ease-in-out infinite;
+        }
+
+        .mike-call[data-state="idle"] .mc-avatar::after,
+        .mike-call[data-state="connected"][data-mode="speaking"] .mc-avatar::after { animation-delay: 0.25s; }
+
+        .mike-call[data-state="ended"] .mc-avatar img,
+        .mike-call[data-state="declined"] .mc-avatar img { border-color: #5A626D; }
+        .mike-call[data-state="ended"] .mc-avatar::before, .mike-call[data-state="ended"] .mc-avatar::after,
+        .mike-call[data-state="declined"] .mc-avatar::before, .mike-call[data-state="declined"] .mc-avatar::after { background: transparent; }
+
+        @keyframes mcRing {
+            0%, 100% { transform: scale(0.94); opacity: 0.75; }
+            50% { transform: scale(1.06); opacity: 1; }
+        }
+
+        .mc-eyebrow {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2.2px;
+            text-transform: uppercase;
+            color: var(--call-green);
+            margin-bottom: 8px;
+        }
+
+        .mike-call[data-state="ended"] .mc-eyebrow,
+        .mike-call[data-state="declined"] .mc-eyebrow { color: var(--call-grey); }
 
         .mc-who {
-            font-family: var(--font-hero);
-            font-size: 40px;
-            font-weight: 600;
-            line-height: 1.1;
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.15;
+            color: #FFFFFF;
         }
 
         .mc-role {
             font-size: 16px;
-            font-weight: 300;
-            opacity: 0.85;
+            color: var(--call-grey);
             margin-top: 6px;
         }
 
+        .mc-urgent {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 18px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: var(--call-amber);
+        }
+
         .mc-situation {
-            font-size: 15px;
-            letter-spacing: 1px;
-            margin-top: 22px;
-            min-height: 1.6em;
+            font-size: 14px;
+            color: var(--call-grey);
+            margin-top: 8px;
+            min-height: 1.4em;
         }
 
         .mc-teaser {
             font-family: var(--font-hero);
             font-size: 24px;
             line-height: 1.3;
-            margin-top: 10px;
+            margin: -6px auto 30px;
+            max-width: 22em;
             text-wrap: balance;
         }
 
-        .mc-choice {
-            font-family: var(--font-hero);
-            font-size: 22px;
-            margin-top: 10px;
-        }
-
         .mc-clock {
-            margin-top: 22px;
+            margin-top: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -1206,28 +1257,64 @@
         }
 
         .mc-clock-label {
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: 600;
             letter-spacing: 2px;
             text-transform: uppercase;
-            opacity: 0.8;
+            color: var(--call-grey);
         }
 
         .mc-clock-time {
-            font-family: var(--font-hero);
-            font-size: 64px;
+            font-size: 52px;
             font-weight: 600;
-            line-height: 1;
-            color: var(--gold);
-            font-variant-numeric: tabular-nums lining-nums;
+            line-height: 1.05;
+            color: var(--call-amber);
+            font-variant-numeric: tabular-nums;
         }
 
-        .mc-clock[data-done="true"] .mc-clock-time { color: var(--text-light); opacity: 0.6; }
+        .mc-clock[data-done="true"] .mc-clock-time { color: var(--call-grey); }
+
+        .mc-choice {
+            font-size: 16px;
+            color: #FFFFFF;
+            margin-top: 8px;
+        }
+
+        /* Shows that the page hears the caller: the bar moves with their voice. */
+        .mc-mic {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 18px;
+            font-size: 11px;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: var(--call-grey);
+        }
+
+        .mc-mic-bar {
+            width: 90px;
+            height: 5px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.14);
+            overflow: hidden;
+        }
+
+        .mc-mic-bar span {
+            display: block;
+            height: 100%;
+            width: 0;
+            border-radius: 3px;
+            background: var(--call-green);
+            transition: width 0.12s linear;
+        }
 
         .mc-status {
-            font-size: 17px;
-            font-weight: 300;
-            margin-top: 18px;
-            min-height: 1.6em;
+            font-size: 15px;
+            color: #FFFFFF;
+            margin-top: 16px;
+            min-height: 1.5em;
         }
 
         .mc-status:empty { display: none; }
@@ -1242,18 +1329,45 @@
             white-space: nowrap;
         }
 
-        .mc-actions { margin-top: 26px; }
-
-        .mike-call .cta-button {
-            margin-top: 0;
-            text-transform: uppercase;
+        .mc-actions {
+            display: flex;
+            justify-content: center;
+            gap: 44px;
+            margin-top: 30px;
         }
 
-        .mc-hangup { border-color: rgba(240, 240, 240, 0.6); color: var(--text-light); }
-        .mc-hangup:hover { background: var(--text-light); color: var(--bg-dark); box-shadow: none; }
+        .mc-act {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: var(--call-grey);
+        }
 
-        .mc-words { margin-top: 22px; text-align: left; font-size: 15px; }
-        .mc-words summary { cursor: pointer; text-align: center; opacity: 0.85; }
+        .mc-round {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 0;
+            color: #FFFFFF;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: transform 0.15s ease, filter 0.15s ease;
+        }
+
+        .mc-round:hover { transform: scale(1.05); filter: brightness(1.08); }
+        .mc-round:focus-visible { outline: 3px solid #FFFFFF; outline-offset: 4px; }
+        .mc-green { background: var(--call-green); color: #10240F; }
+        .mc-red { background: var(--call-red); }
+        .mc-red svg { transform: rotate(135deg); }
+
+        .mc-words { margin-top: 22px; text-align: left; font-size: 14px; color: #FFFFFF; }
+        .mc-words summary { cursor: pointer; text-align: center; color: var(--call-grey); }
         .mc-transcript { margin-top: 12px; max-height: 180px; overflow-y: auto; line-height: 1.5; }
         .mc-transcript p { margin-bottom: 8px; }
 
@@ -1358,8 +1472,9 @@
         }
 
         @media (max-width: 768px) {
-            .mc-who { font-size: 32px; }
-            .mc-clock-time { font-size: 52px; }
+            .mc-who { font-size: 26px; }
+            .mc-clock-time { font-size: 46px; }
+            .mc-actions { gap: 36px; }
             .mc-paper { padding: 22px 16px 18px; }
             .mc-paper-name { font-size: 28px; }
             .mc-paper-headline { font-size: 32px; }
@@ -1369,7 +1484,7 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .mc-dot, .mc-paper, .mc-card.mc-buzzing { animation: none; }
+            .mc-paper, .mc-card.mc-buzzing, .mc-avatar::before, .mc-avatar::after { animation: none !important; }
         }
 
         /* Error States */
@@ -1487,21 +1602,26 @@
                     <div class="mc-scenarios" role="group" aria-labelledby="mcScenariosLabel">
                         <p class="mc-label" id="mcScenariosLabel">Tonight’s situations</p>
                         <div class="mc-scenario-list" id="mcScenarioList"></div>
+                        <p class="mc-teaser" id="mcTeaser"></p>
                     </div>
 
+                    <!-- The call card follows the game's own incoming-call screen. -->
                     <div class="mc-card" id="mcCard">
-                        <p class="mc-eyebrow"><span class="mc-dot" aria-hidden="true"></span><span id="mcEyebrow">Incoming</span></p>
+                        <div class="mc-avatar" id="mcAvatar"><img src="/attached_assets/mike/mike-brannigan.jpg" alt="" width="96" height="96"></div>
+                        <p class="mc-eyebrow" id="mcEyebrow">Incoming secure call</p>
                         <p class="mc-who">Mike Brannigan</p>
                         <p class="mc-role">Chief of Staff</p>
+                        <p class="mc-urgent" id="mcUrgent"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg><span>Urgent matter</span></p>
                         <p class="mc-situation" id="mcSituation"></p>
-                        <p class="mc-teaser" id="mcTeaser"></p>
                         <p class="mc-clock" id="mcClock" aria-hidden="true" hidden><span class="mc-clock-label" id="mcClockLabel">Decision in</span><span class="mc-clock-time" id="mcClockTime">1:30</span></p>
                         <p class="mc-choice" id="mcChoice" hidden></p>
+                        <p class="mc-mic" id="mcMic" aria-hidden="true" hidden><span class="mc-mic-label">Your microphone</span><span class="mc-mic-bar"><span id="mcMicLevel"></span></span></p>
                         <p class="mc-status" id="mcStatus" role="status"></p>
                         <p class="mc-sr" id="mcLive" role="status"></p>
                         <div class="mc-actions">
-                            <button type="button" class="cta-button" id="mcAnswer">Answer</button>
-                            <button type="button" class="cta-button mc-hangup" id="mcHangup" hidden>Hang up</button>
+                            <div class="mc-act" id="mcDeclineWrap"><button type="button" class="mc-round mc-red" id="mcDecline" aria-labelledby="mcDeclineLabel"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button><span id="mcDeclineLabel">Decline</span></div>
+                            <div class="mc-act" id="mcAnswerWrap"><button type="button" class="mc-round mc-green" id="mcAnswer" aria-labelledby="mcAnswerLabel"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button><span id="mcAnswerLabel">Accept</span></div>
+                            <div class="mc-act" id="mcHangupWrap" hidden><button type="button" class="mc-round mc-red" id="mcHangup" aria-labelledby="mcHangupLabel"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button><span id="mcHangupLabel">Hang up</span></div>
                         </div>
                         <details class="mc-words" id="mcWords" hidden>
                             <summary>Show what Mike says</summary>
@@ -2048,6 +2168,6 @@
             }, { passive: true });
         })();
     </script>
-    <script src="/js/mike-call.js?v=local-11" defer></script>
+    <script src="/js/mike-call.js?v=local-12" defer></script>
 </body>
 </html>

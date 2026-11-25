@@ -14,7 +14,9 @@
   const $ = (id) => document.getElementById(id);
   const list = $('mcScenarioList'), eyebrow = $('mcEyebrow'), situation = $('mcSituation'), teaser = $('mcTeaser'), choiceLine = $('mcChoice');
   const clock = $('mcClock'), clockLabel = $('mcClockLabel'), clockTime = $('mcClockTime');
-  const status = $('mcStatus'), answer = $('mcAnswer'), hangup = $('mcHangup');
+  const status = $('mcStatus'), answer = $('mcAnswer'), hangup = $('mcHangup'), decline = $('mcDecline');
+  const answerWrap = $('mcAnswerWrap'), hangupWrap = $('mcHangupWrap'), declineWrap = $('mcDeclineWrap'), answerLabel = $('mcAnswerLabel'), hangupLabel = $('mcHangupLabel');
+  const urgent = $('mcUrgent'), micRow = $('mcMic'), micLevel = $('mcMicLevel');
   const words = $('mcWords'), transcript = $('mcTranscript'), note = $('mcNote');
   const after = $('mcAfter'), paper = $('mcPaper'), paperDate = $('mcPaperDate'), paperHeadline = $('mcPaperHeadline');
   const afterLead = $('mcAfterLead'), afterForm = $('mcAfterForm'), afterEmail = $('mcAfterEmail'), again = $('mcAgain');
@@ -108,7 +110,7 @@
       const b = document.createElement('button');
       b.type = 'button'; b.className = 'mc-scenario'; b.textContent = sc.title;
       b.setAttribute('aria-pressed', String(i === chosen));
-      b.addEventListener('click', () => { choose(i); ring.start(); });
+      b.addEventListener('click', () => { if (root.dataset.state !== 'idle') setState('idle'); choose(i); ring.start(); });
       return b;
     }));
   }
@@ -122,16 +124,20 @@
 
   function setState(state, message) {
     root.dataset.state = state;
+    if (state !== 'connected') delete root.dataset.mode;
     const active = state === 'asking' || state === 'connecting' || state === 'connected';
-    eyebrow.textContent = { idle: 'Incoming', asking: 'Incoming', connecting: 'Putting you through…', connected: 'On the line', ended: 'Call ended', busy: 'Incoming', failed: 'Incoming', denied: 'Incoming' }[state];
-    say(message != null ? message : { asking: 'Asking for your microphone…', connected: 'Mike’s on the line.' }[state] || '');
-    answer.hidden = active || state === 'ended';
-    answer.textContent = state === 'idle' ? 'Answer' : 'Try again';
-    hangup.hidden = !active;
+    eyebrow.textContent = { idle: 'Incoming secure call', asking: 'Incoming secure call', connecting: 'Putting you through…', connected: 'Secure call', ended: 'Call ended', declined: 'Call declined', busy: 'Incoming secure call', failed: 'Incoming secure call', denied: 'Incoming secure call' }[state];
+    say(message != null ? message : { asking: 'Asking for your microphone…', connected: 'Mike’s on the line.', declined: 'Mike will try you again.' }[state] || '');
+    answerWrap.hidden = active || state === 'ended';
+    answerLabel.textContent = state === 'idle' ? 'Accept' : state === 'declined' ? 'Call back' : 'Try again';
+    declineWrap.hidden = state !== 'idle';
+    hangupWrap.hidden = !active;
+    hangupLabel.textContent = state === 'connected' ? 'Hang up' : 'Cancel';
+    urgent.hidden = state !== 'idle';
     note.hidden = active || state === 'ended';
     [...list.children].forEach((b) => { b.disabled = active; });
     words.hidden = state !== 'connected' && !(state === 'ended' && transcript.childElementCount);
-    if (state !== 'connected') { clock.hidden = true; choiceLine.hidden = true; }
+    if (state !== 'connected') { clock.hidden = true; choiceLine.hidden = true; micRow.hidden = true; }
     teaser.hidden = active || state === 'ended';
     if (active) hangup.focus({ preventScroll: true });
   }
@@ -197,6 +203,26 @@
     (headline ? paper : afterLead).scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
   }
 
+  /* ---------- is the microphone heard? ---------- */
+  // The bar moves with the caller's voice. If nothing at all has come from the microphone a few
+  // seconds into the call, the page says so and names the microphone the browser is using.
+  let micTimer = null, micLabel = '';
+  function watchMic(token) {
+    let peak = 0; const began = Date.now(); let warned = false;
+    micRow.hidden = false; micLevel.style.width = '0';
+    clearInterval(micTimer);
+    micTimer = setInterval(() => {
+      if (token !== generation || !conversation || !conversation.getInputVolume) return;
+      let v = 0; try { v = conversation.getInputVolume() || 0; } catch (e) {}
+      peak = Math.max(peak, v);
+      micLevel.style.width = Math.min(100, Math.round(v * 260)) + '%';
+      if (!warned && peak < 0.004 && Date.now() - began > 7000) {
+        warned = true;
+        say('Mike can’t hear you: nothing is coming from your microphone' + (micLabel ? ' (' + micLabel + ')' : '') + '. Check the microphone in your browser’s address bar.');
+      } else if (warned && peak >= 0.02) { warned = false; say('Mike’s on the line.'); }
+    }, 150);
+  }
+
   /* ---------- the call ---------- */
   function loadSDK() {
     if (window.client && window.client.Conversation) return Promise.resolve();
@@ -218,6 +244,7 @@
     if (controller) controller.abort();
     controller = null;
     [connectTimer, limitTimer, clockStartTimer, nudgeTimer].forEach(clearTimeout);
+    clearInterval(micTimer); micTimer = null;
     clearInterval(clockTimer); clockTimer = null;
     simTimers.forEach(clearTimeout); simTimers = [];
     const old = conversation; conversation = null;
@@ -238,7 +265,7 @@
     cleanup();
     setState(state, message);
     if (state === 'ended' && wasConnected) showAfter();
-    else if (state !== 'ended') answer.focus({ preventScroll: true });
+    else if (state !== 'ended') { if (state === 'idle') answer.focus({ preventScroll: true }); else answer.focus({ preventScroll: true }); }
   }
 
   function onConnected(token) {
@@ -274,6 +301,7 @@
     if (SIM) { simulate(token); return; }
     try {
       const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micLabel = (mic.getAudioTracks()[0] && mic.getAudioTracks()[0].label) || '';
       mic.getTracks().forEach((t) => t.stop());
       if (token !== generation) return;
       setState('connecting');
@@ -298,6 +326,7 @@
         preferHeadphonesForIosDevices: true,
         connectionDelay: { default: 500, android: 2000, ios: 1500 },
         onConnect: () => onConnected(token),
+        onModeChange: (m) => { if (token === generation && m) root.dataset.mode = m.mode; },
         onMessage: (m) => { if (m && m.source !== 'user') onMikeSpoke(token, m.message); },
         onDisconnect: () => {
           if (token !== generation) return;
@@ -308,6 +337,7 @@
       });
       if (token !== generation) { try { await session.endSession(); } catch (e) {} return; }
       conversation = session;
+      watchMic(token);
     } catch (error) {
       if (token !== generation) return;
       if (error && (error.name === 'NotAllowedError' || error.name === 'SecurityError')) finish('denied', 'Allow microphone access in your browser, then try again.');
@@ -322,7 +352,7 @@
     const k = params.get('mikesim') === 'fast' ? 0.05 : 1;
     const at = (s, fn) => simTimers.push(setTimeout(() => { if (token === generation) fn(); }, s * 1000 * k));
     at(0.5, () => setState('connecting'));
-    at(1.5, () => onConnected(token));
+    at(1.5, () => { onConnected(token); root.dataset.mode = 'speaking'; });
     at(2, () => onMikeSpoke(token, 'Boss, it’s Mike. Sorry, there’s no good time for this. We’ve got a situation, and I need your decision in the next ninety seconds.'));
     at(8, () => onMikeSpoke(token, 'Iran has shut the strait again. Tanaka wants two destroyers in by morning. Benally wants you on the phone with their ambassador first.'));
     at(40, () => { decisionMade('A phone call to their ambassador'); onMikeSpoke(token, 'A phone call. All right. I’ll tell Tanaka to stand his ships down. He won’t thank you.'); });
@@ -332,6 +362,7 @@
 
   /* ---------- wiring ---------- */
   answer.addEventListener('click', connect);
+  decline.addEventListener('click', () => { ring.stop(); setState('declined'); answer.focus({ preventScroll: true }); });
   hangup.addEventListener('click', () => finish(root.dataset.state === 'connected' ? 'ended' : 'idle'));
   again.addEventListener('click', () => {
     after.hidden = true; paper.hidden = true; clock.hidden = true; transcript.replaceChildren();
