@@ -29,10 +29,10 @@
      seconds. The id goes to the agent as crisis_id; each crisis's full text lives
      in the agent, never here. */
   const SCENARIOS = [
-    { id: 'hormuz', title: 'The Hormuz Deadline', place: 'Strait of Hormuz · 04:10 local', line: 'Iran has shut the strait again. The ceasefire has forty days left.' },
-    { id: 'taiwan', title: 'Invasion of Taiwan', place: 'Taiwan Strait · 05:40 local', line: 'China’s fleet left port an hour ago. It isn’t an exercise.' },
-    { id: 'warhead', title: 'Loose Warhead', place: 'Islamabad · 02:15 local', line: 'A coup in Islamabad, and a warhead isn’t where it should be.' },
-    { id: 'berlin', title: 'Agent in Jeopardy', place: 'Berlin · 23:30 local', line: 'A CIA officer burned in Berlin, holding proof she shouldn’t have.' },
+    { id: 'hormuz', title: 'The Hormuz Deadline', place: 'Strait of Hormuz · 04:10 local', line: 'Iran shut the strait, with two of our tankers behind their gunboats.' },
+    { id: 'taiwan', title: 'Invasion of Taiwan', place: 'Taiwan Strait · 05:40 local', line: 'China’s fleet left port. Beijing swears it’s an exercise.' },
+    { id: 'warhead', title: 'Loose Warhead', place: 'Islamabad · 02:15 local', line: 'A coup in Pakistan, and a nuclear warhead is lost.' },
+    { id: 'berlin', title: 'Agent in Jeopardy', place: 'Berlin · 23:30 local', line: 'One of our spies caught in Berlin, holding something she shouldn’t.' },
   ];
 
   const DEADLINE = 90;   // seconds; the number Mike names
