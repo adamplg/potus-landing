@@ -1145,15 +1145,8 @@
             .duo.duo-two .mike-section,
             .duo.duo-two .video-section { padding: 96px 0; }
 
-            /* Balanced (Adam, 2026-11-25): the card and the tile the same height, their tops level.
-               The card drops by the teaser's heading (its line plus its margin), and the tile
-               grows to the card's height. */
-            .duo.duo-two .video-title { font-size: 36px; line-height: 1.6; margin-bottom: 40px; white-space: nowrap; }
-            .duo.duo-two:not(.duo-after) .mike-call::before {
-                content: "";
-                display: block;
-                height: calc(36px * 1.6 + 40px);
-            }
+            /* Balanced (Adam, 2026-11-25): the card and the tile the same height, their tops level,
+               each with one small line under it. */
             .duo.duo-two .video-wrapper.teaser-tile { --tile: 460px; }
             .duo.duo-two .mc-card { min-height: 460px; }
 
@@ -1469,12 +1462,16 @@
             text-underline-offset: 3px;
         }
 
-        .mc-note {
+        .mc-note,
+        .video-caption {
             margin-top: 18px;
             font-size: 15px;
             font-weight: 300;
             opacity: 0.85;
         }
+
+        /* The teaser's name sits under it, as Mike's note sits under the card (Adam, 2026-11-25). */
+        .video-caption { text-align: center; color: var(--text-light); }
 
         /* Tomorrow's front page (Adam, 2026-11-25: "make it look a bit more like a real newspaper").
            The paper's name, the headline and the whole article are written by Mike's model during
@@ -1732,7 +1729,6 @@
     <!-- Video Section -->
     <section class="video-section">
         <div class="container">
-            <h2 class="video-title">POTUS TEASER VIDEO</h2>
             <!-- A square tile on the page; pressed, it opens to the film's own 9:16 and plays
                  (Adam, 2026-11-25). Without scripts the film shows as before. -->
             <div class="video-wrapper" id="teaser">
@@ -1753,6 +1749,7 @@
                     Your browser does not support the video tag.
                 </video>
             </div>
+            <p class="video-caption">POTUS teaser video</p>
         </div>
     </section>
     </div>
