@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page not found | POTUS</title>
+    <meta name="robots" content="noindex">
+
+    <link rel="icon" type="image/png" href="/attached_assets/potus_favicon.png">
+    <link rel="apple-touch-icon" href="/attached_assets/apple-touch-icon.png">
+    <meta name="theme-color" content="#0D1117">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500;600&display=swap">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-dark: #0D1117;
+            --gold: #CD9218;
+            --text-light: #F0F0F0;
+            --font-hero: 'Cormorant Garamond', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 48px 24px;
+        }
+
+        img { width: 120px; height: 120px; margin-bottom: 40px; }
+
+        h1 {
+            font-family: var(--font-hero);
+            font-size: 48px;
+            font-weight: 600;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+        }
+
+        p { font-size: 18px; font-weight: 300; opacity: 0.9; margin-bottom: 40px; }
+
+        a {
+            display: inline-block;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 16px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        a:hover { background: var(--gold); color: var(--bg-dark); }
+        a:focus-visible { outline: 2px solid var(--text-light); outline-offset: 4px; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 36px; }
+            p { font-size: 16px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) { a { transition: none; } }
+    </style>
+</head>
+<body>
+    <main>
+        <img src="/attached_assets/potus_seal.webp" alt="" width="120" height="120">
+        <h1>Page not found</h1>
+        <p>There is nothing at this address.</p>
+        <a href="/">Back to POTUS</a>
+    </main>
+</body>
+</html>
