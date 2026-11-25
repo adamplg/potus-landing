@@ -34,13 +34,14 @@
   ];
 
   const DEADLINE = 90;   // seconds; the number Mike names
+  const STILL_NO_ANSWER = 12; // seconds after the clock-out before the second bracketed line
   const LIMIT = 170;     // seconds; the page ends the call here whatever happens
   const params = new URLSearchParams(location.search);
   const localhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   const SIM = localhost && params.has('mikesim'); // a pretend call, for checking the page without placing one
 
   let chosen = 0, conversation = null, generation = 0, sdkPromise = null, controller = null;
-  let connectTimer = null, limitTimer = null, clockTimer = null, clockStartTimer = null;
+  let connectTimer = null, limitTimer = null, clockTimer = null, clockStartTimer = null, nudgeTimer = null;
   let decided = false, headline = '', mikeTurns = 0, clockRunning = false, simTimers = [];
 
   /* ---------- the ring ---------- */
@@ -78,6 +79,8 @@
   /* ---------- small helpers ---------- */
   const mmss = (s) => String(Math.floor(s / 60)) + ':' + String(s % 60).padStart(2, '0');
   const say = (text) => { status.textContent = text || ''; };
+  // In expressive mode his text carries performance cues like [brisk]; they shape the voice and are never shown.
+  const shown = (text) => String(text || '').replace(/\[[^\]]*\]/g, ' ').replace(/\s{2,}/g, ' ').trim();
 
   function renderScenarios() {
     list.replaceChildren(...SCENARIOS.map((sc, i) => {
@@ -130,6 +133,11 @@
         // It goes as a user message in square brackets (Marshall: a contextual update never makes him speak; his
         // prompt reads a bracketed line as the clock on the desk, not the President).
         try { if (conversation && conversation.sendUserMessage) conversation.sendUserMessage('[The ninety seconds are up.]'); } catch (e) {}
+        // The safety net (Marshall): if there is still no decision a little later, say so, and he decides for them.
+        nudgeTimer = setTimeout(() => {
+          if (token !== generation || decided) return;
+          try { if (conversation && conversation.sendUserMessage) conversation.sendUserMessage('[Still no answer from the President.]'); } catch (e) {}
+        }, STILL_NO_ANSWER * 1000);
       }
     }, 250);
   }
@@ -137,9 +145,9 @@
   function decisionMade(choice) {
     if (decided) return;
     decided = true;
-    const said = String(choice || '').trim().slice(0, 90);
+    const said = shown(choice).slice(0, 90);
     choiceLine.textContent = said; choiceLine.hidden = !said;
-    clearTimeout(clockStartTimer); clearInterval(clockTimer); clockTimer = null;
+    clearTimeout(clockStartTimer); clearTimeout(nudgeTimer); clearInterval(clockTimer); clockTimer = null;
     clock.hidden = false; clock.dataset.done = 'true';
     clockLabel.textContent = 'Decision made';
     say('');
@@ -147,7 +155,7 @@
 
   /* ---------- the front page ---------- */
   function printHeadline(text) {
-    headline = String(text || '').trim().replace(/^["“‘']+|["”’']+$/g, '').slice(0, 140);
+    headline = shown(text).replace(/^["“‘']+|["”’']+$/g, '').slice(0, 140);
     if (!headline) return;
     const tomorrow = new Date(Date.now() + 86400000);
     paperDate.textContent = tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -188,7 +196,7 @@
     ring.stop();
     if (controller) controller.abort();
     controller = null;
-    [connectTimer, limitTimer, clockStartTimer].forEach(clearTimeout);
+    [connectTimer, limitTimer, clockStartTimer, nudgeTimer].forEach(clearTimeout);
     clearInterval(clockTimer); clockTimer = null;
     simTimers.forEach(clearTimeout); simTimers = [];
     const old = conversation; conversation = null;
@@ -214,8 +222,8 @@
   function onMikeSpoke(token, text) {
     if (token !== generation) return;
     const p = document.createElement('p');
-    p.textContent = String(text || '');
-    transcript.append(p); transcript.scrollTop = transcript.scrollHeight;
+    p.textContent = shown(text);
+    if (p.textContent) transcript.append(p); transcript.scrollTop = transcript.scrollHeight;
     // His first line names the deadline and waits for the caller; the second is the crisis. The clock starts
     // there, so a caller who hasn't answered yet loses no time before they know the problem (Marshall).
     mikeTurns++;
