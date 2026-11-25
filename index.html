@@ -1243,6 +1243,16 @@
 
         .mc-status:empty { display: none; }
 
+        /* Heard by a screen reader, not shown: the headline is already on the page as the front page. */
+        .mc-sr {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
         .mc-actions { margin-top: 26px; }
 
         .mike-call .cta-button {
@@ -1494,6 +1504,7 @@
                         <p class="mc-clock" id="mcClock" aria-hidden="true" hidden><span class="mc-clock-label" id="mcClockLabel">Decision in</span><span class="mc-clock-time" id="mcClockTime">1:30</span></p>
                         <p class="mc-choice" id="mcChoice" hidden></p>
                         <p class="mc-status" id="mcStatus" role="status"></p>
+                        <p class="mc-sr" id="mcLive" role="status"></p>
                         <div class="mc-actions">
                             <button type="button" class="cta-button" id="mcAnswer">Answer</button>
                             <button type="button" class="cta-button mc-hangup" id="mcHangup" hidden>Hang up</button>
@@ -2044,6 +2055,6 @@
             }, { passive: true });
         })();
     </script>
-    <script src="/js/mike-call.js?v=local-7" defer></script>
+    <script src="/js/mike-call.js?v=local-8" defer></script>
 </body>
 </html>

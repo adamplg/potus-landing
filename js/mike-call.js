@@ -163,7 +163,7 @@
     after.hidden = false; paper.hidden = false;
     afterLead.hidden = true; afterForm.hidden = true; again.hidden = true;
     after.querySelectorAll('.mc-after-line, .mc-after-small').forEach((e) => { e.hidden = true; });
-    say('Tomorrow’s front page: ' + headline);
+    $('mcLive').textContent = 'Tomorrow’s front page, The Potomac Dispatch: ' + headline;
   }
 
   function showAfter() {
