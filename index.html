@@ -698,7 +698,7 @@
         }
 
         .footer-link {
-            color: rgba(205, 146, 24, 0.6);
+            color: rgba(205, 146, 24, 0.85); /* 0.6 was 3.18:1 on the footer; this is about 5:1 (WCAG 1.4.3) */
             text-decoration: none;
             transition: color 0.2s ease;
         }
@@ -893,9 +893,12 @@
                 max-width: 65%;
                 margin: 0 auto;
             }
+            /* 100svh, not -webkit-fill-available: outside Safari that value fell back to
+               the content's height, so on Android the hero shrank and the seal sat over
+               the headline (2026-11-25). svh is the screen with the browser's bars showing. */
             .hero {
                 height: 100vh;
-                height: -webkit-fill-available;
+                height: 100svh;
                 position: relative;
                 overflow: hidden;
             }
@@ -914,7 +917,7 @@
                 transform: translateZ(0);
             }
             .potus-seal {
-                top: 10vh;
+                top: 8vh; /* 10vh touched the headline on short phones (667 high) */
                 width: 173px;
                 height: 173px;
             }
