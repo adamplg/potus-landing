@@ -4,9 +4,8 @@
    page as he reads the headline, and offers the waitlist when the line goes dead.
 
    The page asks its own server for a signed link (/api/mike-link); the
-   ElevenLabs client opens the call. The agent gets the chosen crisis as the
-   dynamic variable crisis_id, and calls two client tools on this page:
-   decision_made() and show_headline({ headline }). */
+   ElevenLabs client opens the call. The agent calls two client tools on this
+   page: decision_made({ choice }) and show_headline({ headline }). */
 (() => {
   'use strict';
   const root = document.getElementById('mike');
@@ -26,8 +25,7 @@
   root.hidden = false;
 
   /* One scenario (Adam, 2026-11-25: "Let's make it one scenario and make it simple and good").
-     Its id goes to the agent as crisis_id; the crisis's text lives in the agent, never here. */
-  const CRISIS_ID = 'hormuz';
+     The crisis lives in the agent's own prompt; the page sends nothing to choose it. */
 
   const DEADLINE = 90;   // seconds; the number Mike names
   const STILL_NO_ANSWER = 12; // seconds after the clock-out before the second bracketed line
@@ -294,7 +292,6 @@
 
       const session = await window.client.Conversation.startSession({
         signedUrl,
-        dynamicVariables: { crisis_id: CRISIS_ID },
         clientTools: {
           decision_made: (p) => { if (token === generation) decisionMade(p && p.choice); return 'ok'; },
           show_headline: (p) => { if (token === generation) keepHeadline(p && p.headline); return 'shown'; },
