@@ -24,6 +24,7 @@
   // No microphone API or no secure connection: the block stays hidden and the page is as before.
   if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.WebSocket) return;
   root.hidden = false;
+  const section = root.closest('.mike-section'); if (section) section.hidden = false;
 
   /* One scenario (Adam, 2026-11-25: "Let's make it one scenario and make it simple and good").
      The crisis lives in the agent's own prompt; the page sends nothing to choose it. */

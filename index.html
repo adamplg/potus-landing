@@ -232,6 +232,64 @@
             background: #000;
         }
 
+        /* The teaser as a square tile; pressed, the frame grows to 9:16 and the film plays. */
+        .video-wrapper.teaser-tile {
+            --tile: min(420px, 78vw);
+            width: var(--tile);
+            max-width: none;
+            height: var(--tile);
+            transition: height 0.5s ease;
+        }
+
+        .video-wrapper.teaser-tile.teaser-open { height: calc(var(--tile) * 16 / 9); }
+
+        .video-wrapper.teaser-tile video { height: 100%; object-fit: cover; }
+
+        .video-tile {
+            position: absolute;
+            inset: 0;
+            padding: 0;
+            border: 0;
+            background: #000;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-tile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 42%;
+            display: block;
+        }
+
+        .video-play {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 84px;
+            height: 84px;
+            margin: -42px 0 0 -42px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: var(--gold);
+            background: rgba(13, 17, 23, 0.72);
+            border: 2px solid var(--gold);
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+
+        .video-play svg { margin-left: 4px; }
+        .video-tile:hover .video-play, .video-tile:focus-visible .video-play { transform: scale(1.06); background: var(--gold); color: var(--bg-dark); }
+        .video-tile:focus-visible { outline: 3px solid var(--text-light); outline-offset: 4px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .video-wrapper.teaser-tile { transition: none; }
+            .video-play { transition: none; }
+        }
+
         /* Screenshots Section */
         .screenshots {
             padding: 80px 0 100px;
@@ -887,6 +945,8 @@
                 max-width: 65%;
                 margin: 0 auto;
             }
+
+            .video-wrapper.teaser-tile { max-width: none; }
             /* 100svh, not -webkit-fill-available: outside Safari that value fell back to
                the content's height, so on Android the hero shrank and the seal sat over
                the headline (2026-11-25). svh is the screen with the browser's bars showing. */
@@ -1069,9 +1129,15 @@
         }
 
         /* Mike's call (local build, 2026-11-25) */
+        .mike-section {
+            padding: 90px 0 70px;
+            background: var(--bg-dark);
+            text-align: center;
+        }
+
         .mike-call {
             max-width: 960px;
-            margin: 24px auto 0;
+            margin: 0 auto;
             scroll-margin-top: 40px;
         }
 
@@ -1576,12 +1642,73 @@
         </div>
     </section>
 
+    <!-- Mike's call: the first thing below the fold (Adam, 2026-11-25) -->
+    <section class="mike-section" id="mike-section" hidden>
+        <div class="container">
+                <!-- Mike's call (2026-11-25). The section stays hidden until js/mike-call.js finds a microphone API. -->
+                <div class="mike-call" id="mike" data-state="idle" hidden>
+                    <!-- The call card follows the game's own incoming-call screen. -->
+                    <div class="mc-card" id="mcCard">
+                        <div class="mc-avatar" id="mcAvatar"><img src="/attached_assets/mike/mike-brannigan.jpg" alt="" width="96" height="96"></div>
+                        <p class="mc-eyebrow" id="mcEyebrow">Incoming secure call</p>
+                        <p class="mc-who">Mike Brannigan</p>
+                        <p class="mc-role">Chief of Staff</p>
+                        <p class="mc-urgent" id="mcUrgent"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg><span>Urgent matter</span></p>
+                        <p class="mc-clock" id="mcClock" aria-hidden="true" hidden><span class="mc-clock-label" id="mcClockLabel">Decision in</span><span class="mc-clock-time" id="mcClockTime">1:30</span></p>
+                        <p class="mc-choice" id="mcChoice" hidden></p>
+                        <p class="mc-mic" id="mcMic" aria-hidden="true" hidden><span class="mc-mic-label" id="mcMicName">Your microphone</span><span class="mc-mic-bar"><span id="mcMicLevel"></span></span></p>
+                        <p class="mc-status" id="mcStatus" role="status"></p>
+                        <p class="mc-sr" id="mcLive" role="status"></p>
+                        <div class="mc-actions">
+                            <div class="mc-act" id="mcDeclineWrap"><button type="button" class="mc-round mc-red" id="mcDecline" aria-labelledby="mcDeclineLabel"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button><span id="mcDeclineLabel">Decline</span></div>
+                            <div class="mc-act" id="mcAnswerWrap"><button type="button" class="mc-round mc-green" id="mcAnswer" aria-labelledby="mcAnswerLabel"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button><span id="mcAnswerLabel">Accept</span></div>
+                            <div class="mc-act" id="mcHangupWrap" hidden><button type="button" class="mc-round mc-red" id="mcHangup" aria-labelledby="mcHangupLabel"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button><span id="mcHangupLabel">Hang up</span></div>
+                        </div>
+                        <details class="mc-words" id="mcWords" hidden>
+                            <summary>Show what Mike says</summary>
+                            <div class="mc-transcript" id="mcTranscript"></div>
+                        </details>
+                    </div>
+                    <p class="mc-note" id="mcNote">Mike is an AI voice. About two and a half minutes. It uses your microphone. <a href="/privacy#the-call-with-mike">Privacy</a></p>
+
+                    <div class="mc-after" id="mcAfter" hidden>
+                        <article class="mc-paper" id="mcPaper" hidden aria-label="Tomorrow’s front page">
+                            <div class="mc-paper-sheet" id="mcPaperSheet">
+                                <p class="mc-paper-name" id="mcPaperName"></p>
+                                <p class="mc-paper-line"><span>Late Edition</span><span id="mcPaperDate"></span><span>bepotus.ai</span></p>
+                                <h3 class="mc-paper-headline" id="mcPaperHeadline"></h3>
+                                <p class="mc-paper-deck" id="mcPaperDeck"></p>
+                                <div class="mc-paper-body" id="mcPaperBody"></div>
+                            </div>
+                        </article>
+                        <div class="mc-after-side">
+                        <p class="mc-after-lead" id="mcAfterLead" tabindex="-1">That was round one.</p>
+                        <p class="mc-after-line">The full game is for iPhone.</p>
+                        <form class="mc-after-form" id="mcAfterForm" novalidate>
+                            <input type="email" id="mcAfterEmail" placeholder="Your email address" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" aria-label="Email address" required>
+                            <button type="submit" class="submit-button">GET EARLY ACCESS</button>
+                        </form>
+                        <p class="mc-after-small">Join the waitlist and we’ll tell you when POTUS launches.</p>
+                        <button type="button" class="mc-again" id="mcAgain">Take the call again</button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </section>
+
     <!-- Video Section -->
     <section class="video-section">
         <div class="container">
             <h2 class="video-title">POTUS TEASER VIDEO</h2>
-            <div class="video-wrapper">
+            <!-- A square tile on the page; pressed, it opens to the film's own 9:16 and plays
+                 (Adam, 2026-11-25). Without scripts the film shows as before. -->
+            <div class="video-wrapper" id="teaser">
+                <button type="button" class="video-tile" id="teaserOpen" aria-label="Play the POTUS teaser video" hidden>
+                    <img src="attached_assets/video_poster.jpg" alt="" loading="lazy" width="1080" height="1920">
+                    <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></span>
+                </button>
                 <video
+                    id="teaserVideo"
                     controls
                     poster="attached_assets/video_poster.jpg"
                     preload="metadata"
@@ -1658,54 +1785,6 @@
                 <p class="stake-line">When Mike calls you 'Mr. President,' you'll feel the weight of it.</p>
                 <p class="stake-line">Your enemies can turn into allies, and your allies can turn their backs - it all depends on your diplomacy skills.</p>
                 <p class="stake-line">When you say "Get me General Tanaka on the line", you'll feel what it's like to command the mightiest army on earth.</p>
-                <!-- Mike's call (local build, 2026-11-25). Hidden until js/mike-call.js finds a microphone API. -->
-                <div class="mike-call" id="mike" data-state="idle" hidden>
-                    <!-- The call card follows the game's own incoming-call screen. -->
-                    <div class="mc-card" id="mcCard">
-                        <div class="mc-avatar" id="mcAvatar"><img src="/attached_assets/mike/mike-brannigan.jpg" alt="" width="96" height="96"></div>
-                        <p class="mc-eyebrow" id="mcEyebrow">Incoming secure call</p>
-                        <p class="mc-who">Mike Brannigan</p>
-                        <p class="mc-role">Chief of Staff</p>
-                        <p class="mc-urgent" id="mcUrgent"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2zm1 15h-2v-2h2v2zm0-4h-2V9h2v4z"/></svg><span>Urgent matter</span></p>
-                        <p class="mc-clock" id="mcClock" aria-hidden="true" hidden><span class="mc-clock-label" id="mcClockLabel">Decision in</span><span class="mc-clock-time" id="mcClockTime">1:30</span></p>
-                        <p class="mc-choice" id="mcChoice" hidden></p>
-                        <p class="mc-mic" id="mcMic" aria-hidden="true" hidden><span class="mc-mic-label" id="mcMicName">Your microphone</span><span class="mc-mic-bar"><span id="mcMicLevel"></span></span></p>
-                        <p class="mc-status" id="mcStatus" role="status"></p>
-                        <p class="mc-sr" id="mcLive" role="status"></p>
-                        <div class="mc-actions">
-                            <div class="mc-act" id="mcDeclineWrap"><button type="button" class="mc-round mc-red" id="mcDecline" aria-labelledby="mcDeclineLabel"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button><span id="mcDeclineLabel">Decline</span></div>
-                            <div class="mc-act" id="mcAnswerWrap"><button type="button" class="mc-round mc-green" id="mcAnswer" aria-labelledby="mcAnswerLabel"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button><span id="mcAnswerLabel">Accept</span></div>
-                            <div class="mc-act" id="mcHangupWrap" hidden><button type="button" class="mc-round mc-red" id="mcHangup" aria-labelledby="mcHangupLabel"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></button><span id="mcHangupLabel">Hang up</span></div>
-                        </div>
-                        <details class="mc-words" id="mcWords" hidden>
-                            <summary>Show what Mike says</summary>
-                            <div class="mc-transcript" id="mcTranscript"></div>
-                        </details>
-                    </div>
-                    <p class="mc-note" id="mcNote">Mike is an AI voice. About two and a half minutes. It uses your microphone. <a href="/privacy#the-call-with-mike">Privacy</a></p>
-
-                    <div class="mc-after" id="mcAfter" hidden>
-                        <article class="mc-paper" id="mcPaper" hidden aria-label="Tomorrow’s front page">
-                            <div class="mc-paper-sheet" id="mcPaperSheet">
-                                <p class="mc-paper-name" id="mcPaperName"></p>
-                                <p class="mc-paper-line"><span>Late Edition</span><span id="mcPaperDate"></span><span>bepotus.ai</span></p>
-                                <h3 class="mc-paper-headline" id="mcPaperHeadline"></h3>
-                                <p class="mc-paper-deck" id="mcPaperDeck"></p>
-                                <div class="mc-paper-body" id="mcPaperBody"></div>
-                            </div>
-                        </article>
-                        <div class="mc-after-side">
-                        <p class="mc-after-lead" id="mcAfterLead" tabindex="-1">That was round one.</p>
-                        <p class="mc-after-line">The full game is for iPhone.</p>
-                        <form class="mc-after-form" id="mcAfterForm" novalidate>
-                            <input type="email" id="mcAfterEmail" placeholder="Your email address" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" aria-label="Email address" required>
-                            <button type="submit" class="submit-button">GET EARLY ACCESS</button>
-                        </form>
-                        <p class="mc-after-small">Join the waitlist and we’ll tell you when POTUS launches.</p>
-                        <button type="button" class="mc-again" id="mcAgain">Take the call again</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -2227,6 +2306,23 @@
             }, { passive: true });
         })();
     </script>
-    <script src="/js/mike-call.js?v=local-17" defer></script>
+    <script>
+    // The teaser: show the square tile, and open to the film's 9:16 when it is pressed.
+    (() => {
+        const wrap = document.getElementById('teaser'), open = document.getElementById('teaserOpen'), video = document.getElementById('teaserVideo');
+        if (!wrap || !open || !video) return;
+        wrap.classList.add('teaser-tile');
+        open.hidden = false; video.hidden = true;
+        open.addEventListener('click', () => {
+            wrap.classList.add('teaser-open');
+            open.hidden = true; video.hidden = false;
+            const play = video.play(); if (play && play.catch) play.catch(() => {});
+            video.focus({ preventScroll: true });
+            const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            setTimeout(() => wrap.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'center' }), still ? 0 : 320);
+        });
+    })();
+    </script>
+    <script src="/js/mike-call.js?v=local-18" defer></script>
 </body>
 </html>
