@@ -313,6 +313,8 @@
     if (main.requestSubmit) main.requestSubmit(); else main.dispatchEvent(new Event('submit', { cancelable: true }));
   });
   window.addEventListener('pagehide', cleanup);
+  // On this Mac only: lets a test type a line as the caller, to check the page end to end without a voice.
+  if (localhost) window.__mikeSay = (text) => { try { if (conversation && conversation.sendUserMessage) conversation.sendUserMessage(String(text)); } catch (e) {} };
 
   renderScenarios();
   choose(0);
