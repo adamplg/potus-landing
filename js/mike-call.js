@@ -221,7 +221,15 @@
     clearInterval(clockTimer); clockTimer = null;
     simTimers.forEach(clearTimeout); simTimers = [];
     const old = conversation; conversation = null;
-    if (old) { try { await old.endSession(); } catch (e) {} }
+    let id = '';
+    if (old) {
+      try { id = old.getId ? old.getId() : ''; } catch (e) {}
+      try { await old.endSession(); } catch (e) {}
+    }
+    // The call isn't kept: once the line has closed, the page asks its server to delete the conversation at ElevenLabs.
+    if (id) {
+      try { fetch('/api/mike-end', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }), keepalive: true }).catch(() => {}); } catch (e) {}
+    }
   }
 
   function finish(state, message) {
