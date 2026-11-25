@@ -45,28 +45,49 @@
   let decided = false, headline = '', mikeTurns = 0, clockRunning = false, simTimers = [];
 
   /* ---------- the ring ---------- */
-  // A stand-in two-tone ring made in the browser, until the app's own sound file arrives.
+  // Adam: "a buzzin like a phone vibrating on silent". Made in the browser: a low motor
+  // hum with a rattle, two buzzes and a pause, and the card shivers with each buzz.
+  const card = $('mcCard');
   const ring = (() => {
     let ctx = null, timer = null, stopAt = 0;
-    function burst() {
+    const BUZZ = 0.85, GAP = 0.35, CYCLE = 3600; // seconds, seconds, milliseconds
+    function buzz(at) {
+      const g = ctx.createGain(), lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = 520;
+      g.gain.setValueAtTime(0, at);
+      g.gain.linearRampToValueAtTime(0.16, at + 0.04);
+      g.gain.setValueAtTime(0.16, at + BUZZ - 0.06);
+      g.gain.linearRampToValueAtTime(0, at + BUZZ);
+      // the rattle: the hum's loudness flutters about thirty times a second
+      const lfo = ctx.createOscillator(), depth = ctx.createGain();
+      lfo.type = 'square'; lfo.frequency.value = 31; depth.gain.value = 0.07;
+      lfo.connect(depth); depth.connect(g.gain);
+      [[158, 'sawtooth'], [79, 'square'], [316, 'triangle']].forEach(([f, type]) => {
+        const o = ctx.createOscillator(); o.type = type; o.frequency.value = f; o.connect(lp); o.start(at); o.stop(at + BUZZ + 0.02);
+      });
+      lfo.start(at); lfo.stop(at + BUZZ + 0.02);
+      lp.connect(g); g.connect(ctx.destination);
+    }
+    function cycle() {
       if (!ctx) return;
-      const t = ctx.currentTime, g = ctx.createGain();
-      g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(0.07, t + 0.05);
-      g.gain.setValueAtTime(0.07, t + 1.6);
-      g.gain.linearRampToValueAtTime(0, t + 1.8);
-      g.connect(ctx.destination);
-      [440, 480].forEach((f) => { const o = ctx.createOscillator(); o.frequency.value = f; o.connect(g); o.start(t); o.stop(t + 1.85); });
+      const t = ctx.currentTime + 0.02;
+      buzz(t); buzz(t + BUZZ + GAP);
+      card.classList.remove('mc-buzzing'); void card.offsetWidth; card.classList.add('mc-buzzing');
+      if (navigator.vibrate) { try { navigator.vibrate([BUZZ * 1000, GAP * 1000, BUZZ * 1000]); } catch (e) {} }
     }
     return {
       start() {
         this.stop();
         try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
-        stopAt = Date.now() + 24000; // it doesn't ring for ever
-        burst();
-        timer = setInterval(() => { if (Date.now() > stopAt) this.stop(); else burst(); }, 4000);
+        stopAt = Date.now() + 22000; // it doesn't buzz for ever
+        cycle();
+        timer = setInterval(() => { if (Date.now() > stopAt) this.stop(); else cycle(); }, CYCLE);
       },
-      stop() { clearInterval(timer); timer = null; if (ctx) { try { ctx.close(); } catch (e) {} ctx = null; } },
+      stop() {
+        clearInterval(timer); timer = null; card.classList.remove('mc-buzzing');
+        if (navigator.vibrate) { try { navigator.vibrate(0); } catch (e) {} }
+        if (ctx) { try { ctx.close(); } catch (e) {} ctx = null; }
+      },
     };
   })();
 
