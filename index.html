@@ -1129,6 +1129,26 @@
         }
 
         /* Mike's call (2026-11-25) */
+        /* Mike's call beside the teaser on a wide screen; one under the other on a phone. When the
+           call has ended, the front page and the sign-up take the whole row and the film moves below. */
+        .duo { background: var(--bg-dark); }
+
+        @media (min-width: 1000px) {
+            .duo.duo-two {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                align-items: center;
+                max-width: 1180px;
+                margin: 0 auto;
+            }
+
+            .duo.duo-two .mike-section,
+            .duo.duo-two .video-section { padding: 96px 0; }
+
+            .duo.duo-two.duo-after { grid-template-columns: 1fr; }
+            .duo.duo-two.duo-after .video-section { padding-top: 0; }
+        }
+
         .mike-section {
             padding: 90px 0 70px;
             background: var(--bg-dark);
@@ -1642,7 +1662,8 @@
         </div>
     </section>
 
-    <!-- Mike's call: the first thing below the fold (Adam, 2026-11-25) -->
+    <!-- Just below the fold: Mike's call and the teaser, side by side on a wide screen (Adam, 2026-11-25) -->
+    <div class="duo" id="duo">
     <section class="mike-section" id="mike-section" hidden>
         <div class="container">
                 <!-- Mike's call (2026-11-25). The section stays hidden until js/mike-call.js finds a microphone API. -->
@@ -1722,6 +1743,7 @@
             </div>
         </div>
     </section>
+    </div>
 
     <!-- Screenshots Section -->
     <section class="screenshots">
@@ -2323,6 +2345,6 @@
         });
     })();
     </script>
-    <script src="/js/mike-call.js?v=2026-11-25" defer></script>
+    <script src="/js/mike-call.js?v=2026-11-25b" defer></script>
 </body>
 </html>

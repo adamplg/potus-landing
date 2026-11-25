@@ -25,6 +25,7 @@
   if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.WebSocket) return;
   root.hidden = false;
   const section = root.closest('.mike-section'); if (section) section.hidden = false;
+  const duo = root.closest('.duo'); if (duo) duo.classList.add('duo-two');
 
   /* One scenario (Adam, 2026-11-25: "Let's make it one scenario and make it simple and good").
      The crisis lives in the agent's own prompt; the page sends nothing to choose it. */
@@ -216,6 +217,7 @@
     after.dataset.paper = headline ? 'yes' : 'none';
     after.hidden = false;
     card.hidden = true;
+    if (duo) duo.classList.add('duo-after');
     afterLead.textContent = decided || headline ? 'That was round one.' : 'The line went dead.';
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     root.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
@@ -320,6 +322,7 @@
     ring.stop();
     decided = false; headline = ''; page = null; mikeTurns = 0; clockRunning = false;
     transcript.replaceChildren(); clock.hidden = true; choiceLine.hidden = true; choiceLine.textContent = ''; after.hidden = true; paper.hidden = true; card.hidden = false;
+    if (duo) duo.classList.remove('duo-after');
     controller = new AbortController();
     document.querySelectorAll('video,audio').forEach((m) => m.pause());
     setState('asking');
@@ -392,6 +395,7 @@
   hangup.addEventListener('click', () => finish(root.dataset.state === 'connected' ? 'ended' : 'idle'));
   again.addEventListener('click', () => {
     after.hidden = true; paper.hidden = true; clock.hidden = true; transcript.replaceChildren(); headline = ''; page = null;
+    if (duo) duo.classList.remove('duo-after');
     setState('idle');
     root.scrollIntoView({ block: 'start' });
     answer.focus({ preventScroll: true });
