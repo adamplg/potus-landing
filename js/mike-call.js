@@ -34,7 +34,6 @@
   ];
 
   const DEADLINE = 90;   // seconds; the number Mike names
-  const CLOCK_DELAY = 5; // seconds after his first words, when he has named it
   const LIMIT = 170;     // seconds; the page ends the call here whatever happens
   const params = new URLSearchParams(location.search);
   const localhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
@@ -42,7 +41,7 @@
 
   let chosen = 0, conversation = null, generation = 0, sdkPromise = null, controller = null;
   let connectTimer = null, limitTimer = null, clockTimer = null, clockStartTimer = null;
-  let decided = false, headline = '', heardMike = false, simTimers = [];
+  let decided = false, headline = '', mikeTurns = 0, clockRunning = false, simTimers = [];
 
   /* ---------- the ring ---------- */
   // A stand-in two-tone ring made in the browser, until the app's own sound file arrives.
@@ -127,8 +126,10 @@
         clearInterval(clockTimer); clockTimer = null;
         clockLabel.textContent = 'Time’s up';
         say('Time’s up.');
-        // Tell Mike, so he presses for an answer. A deadline that passed with nothing happening would break the spell.
-        try { if (conversation && conversation.sendContextualUpdate) conversation.sendContextualUpdate('The ninety seconds are up.'); } catch (e) {}
+        // Tell Mike, so he presses for an answer: a deadline that passed with nothing happening would break the spell.
+        // It goes as a user message in square brackets (Marshall: a contextual update never makes him speak; his
+        // prompt reads a bracketed line as the clock on the desk, not the President).
+        try { if (conversation && conversation.sendUserMessage) conversation.sendUserMessage('[The ninety seconds are up.]'); } catch (e) {}
       }
     }, 250);
   }
@@ -215,10 +216,10 @@
     const p = document.createElement('p');
     p.textContent = String(text || '');
     transcript.append(p); transcript.scrollTop = transcript.scrollHeight;
-    if (!heardMike) {
-      heardMike = true;
-      clockStartTimer = setTimeout(() => { if (token === generation && !decided) startClock(token); }, CLOCK_DELAY * 1000);
-    }
+    // His first line names the deadline and waits for the caller; the second is the crisis. The clock starts
+    // there, so a caller who hasn't answered yet loses no time before they know the problem (Marshall).
+    mikeTurns++;
+    if (mikeTurns === 2 && !decided && !clockRunning) { clockRunning = true; startClock(token); }
   }
 
   const BUSY = 'Mike’s in the Situation Room. Try again later, or join the waitlist below.';
@@ -227,7 +228,7 @@
     if (['asking', 'connecting', 'connected'].includes(root.dataset.state)) return;
     const token = ++generation;
     ring.stop();
-    decided = false; headline = ''; heardMike = false;
+    decided = false; headline = ''; mikeTurns = 0; clockRunning = false;
     transcript.replaceChildren(); clock.hidden = true; choiceLine.hidden = true; choiceLine.textContent = ''; after.hidden = true; paper.hidden = true;
     controller = new AbortController();
     document.querySelectorAll('video,audio').forEach((m) => m.pause());
@@ -286,6 +287,7 @@
     at(0.5, () => setState('connecting'));
     at(1.5, () => onConnected(token));
     at(2, () => onMikeSpoke(token, 'Boss, it’s Mike. Sorry, there’s no good time for this. We’ve got a situation, and I need your decision in the next ninety seconds.'));
+    at(8, () => onMikeSpoke(token, 'Iran has shut the strait again. Tanaka wants two destroyers in by morning. Benally wants you on the phone with their ambassador first.'));
     at(40, () => { decisionMade('A phone call to their ambassador'); onMikeSpoke(token, 'A phone call. All right. I’ll tell Tanaka to stand his ships down. He won’t thank you.'); });
     at(55, () => { printHeadline('President Blinks in Hormuz Standoff'); onMikeSpoke(token, 'Tomorrow’s Potomac Dispatch: “President Blinks in Hormuz Standoff.”'); });
     at(70, () => finish('ended'));
