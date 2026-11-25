@@ -1088,6 +1088,38 @@
             }
         }
 
+        /* A call with Mike (2026-11-25) */
+        .mike-call .cta-button {
+            margin-top: 0;
+            text-transform: uppercase;
+        }
+
+        .mike-call-timer {
+            margin-top: 20px;
+            font-size: 15px;
+            letter-spacing: 2px;
+            color: var(--gold);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .mike-call-status {
+            margin-top: 16px;
+            font-size: 18px;
+            font-weight: 300;
+            min-height: 1.6em;
+        }
+
+        .mike-call-status:empty {
+            display: none;
+        }
+
+        .mike-call-note {
+            margin-top: 20px;
+            font-size: 15px;
+            font-weight: 300;
+            opacity: 0.85;
+        }
+
         /* Error States */
         .error-message {
             color: #ff6b6b;
@@ -1199,6 +1231,14 @@
                 <p class="stake-line">When Mike calls you 'Mr. President' or 'Madam President,' you'll feel the weight of it.</p>
                 <p class="stake-line">Your enemies can turn into allies, and your allies can turn their backs - it all depends on your diplomacy skills.</p>
                 <p class="stake-line">When you say "Get me General Tanaka on the line", you'll feel what it's like to command the mightiest army on earth.</p>
+                <!-- A short call with Mike. Hidden until js/mike-call.js finds a microphone API. -->
+                <div class="mike-call" id="mikeCall" data-state="idle" hidden>
+                    <button type="button" class="cta-button" id="mikeCallStart">Call Mike</button>
+                    <button type="button" class="cta-button" id="mikeCallEnd" hidden>Cancel</button>
+                    <p class="mike-call-timer" id="mikeCallTimer" aria-hidden="true" hidden>2:50</p>
+                    <p class="mike-call-status" id="mikeCallStatus" role="status"></p>
+                    <p class="mike-call-note" id="mikeCallNote">Mike is an AI voice. The call uses your microphone and lasts up to three minutes.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -1721,5 +1761,6 @@
             }, { passive: true });
         })();
     </script>
+    <script src="/js/mike-call.js?v=2026-11-25" defer></script>
 </body>
 </html>
