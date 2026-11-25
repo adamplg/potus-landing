@@ -552,7 +552,16 @@
         .signup-box h2 {
             font-family: var(--font-hero);
             font-size: 32px;
-            margin-bottom: 48px;
+            margin-bottom: 14px;
+        }
+
+        /* How many are waiting, under the heading; it takes the heading's old
+           bottom margin (2026-11-25). */
+        .signup-count {
+            font-size: 16px;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 40px;
         }
 
         #signupForm {
@@ -1198,7 +1207,8 @@
     <section class="signup" id="signup">
         <div class="container">
             <div class="signup-box">
-                <h2>Join more than 2,000 people on the waitlist.</h2>
+                <h2>The first 500 on the waitlist get exclusive early access.</h2>
+                <p class="signup-count">More than 2,000 people are already waiting.</p>
                 <form id="signupForm" novalidate>
                     <input
                         type="email"
