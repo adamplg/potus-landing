@@ -1410,6 +1410,19 @@
                     delivered = false;
                 }
 
+                // Only a saved address is confirmed. If the write failed, the
+                // visitor is told and can try again, rather than being told
+                // they're on a list they aren't on.
+                if (!delivered) {
+                    gtag('event', 'signup_delivery_failed', { method: 'email' });
+                    errorDiv.textContent = "We couldn't save your address just now. Please try again in a moment.";
+                    errorDiv.style.display = 'block';
+                    submitButton.disabled = false;
+                    buttonText.style.display = 'inline';
+                    buttonLoading.style.display = 'none';
+                    return;
+                }
+
                 gtag('event', 'sign_up', {
                     method: 'email',
                     utm_source: urlParams.get('utm_source') || '(none)',
@@ -1417,13 +1430,6 @@
                     utm_campaign: urlParams.get('utm_campaign') || '(none)',
                     page_referrer: document.referrer || '(direct)'
                 });
-
-                // The signup is still confirmed to the visitor either way — but a
-                // failed write is recorded so lost addresses are visible in GA4
-                // instead of disappearing without trace.
-                if (!delivered) {
-                    gtag('event', 'signup_delivery_failed', { method: 'email' });
-                }
 
                 showConfirmation();
             } catch (err) {
