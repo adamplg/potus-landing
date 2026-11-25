@@ -12,7 +12,7 @@ POTUS is an interactive leadership simulation where players step into the role o
 - **Video Teaser**: Embedded video showcasing the game experience
 - **Screenshots Gallery**: Horizontal scrollable gallery of in-game screenshots with lightbox carousel (keyboard, touch swipe, and click navigation)
 - **Key Features Display**: Highlights of voice calls, command decisions, and dynamic scenarios
-- **Email Signup**: Early access form (limited to 500 users) posting to a Google Apps Script endpoint that appends to a Google Sheet
+- **Email Signup**: Waitlist form posting to a Google Apps Script endpoint that appends to a Google Sheet
 - **Confirmation Screen**: Post-signup confirmation with social sharing options
 - **Responsive Design**: Optimized for desktop and mobile devices
 - **Accessibility**: Keyboard-navigable gallery and lightbox, visible focus states, and full `prefers-reduced-motion` support
