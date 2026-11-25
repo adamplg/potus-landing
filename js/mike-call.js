@@ -12,7 +12,7 @@
   const root = document.getElementById('mike');
   if (!root) return;
   const $ = (id) => document.getElementById(id);
-  const list = $('mcScenarioList'), eyebrow = $('mcEyebrow'), situation = $('mcSituation');
+  const list = $('mcScenarioList'), eyebrow = $('mcEyebrow'), situation = $('mcSituation'), teaser = $('mcTeaser'), choiceLine = $('mcChoice');
   const clock = $('mcClock'), clockLabel = $('mcClockLabel'), clockTime = $('mcClockTime');
   const status = $('mcStatus'), answer = $('mcAnswer'), hangup = $('mcHangup');
   const words = $('mcWords'), transcript = $('mcTranscript'), note = $('mcNote');
@@ -23,12 +23,14 @@
   if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.WebSocket) return;
   root.hidden = false;
 
-  /* STAND-INS until Marshall sends the real ids and titles. The id goes to the
-     agent; the crisis's full text lives in the agent, never here. */
+  /* Marshall's situations (2026-11-25): the game's own scenarios cut down to ninety
+     seconds. The id goes to the agent as crisis_id; each crisis's full text lives
+     in the agent, never here. */
   const SCENARIOS = [
-    { id: 'strait', title: 'The Strait', line: '03:12 · a tanker boarded at sea' },
-    { id: 'blackout', title: 'The Blackout', line: '21:40 · three states without power' },
-    { id: 'embassy', title: 'The Embassy', line: '05:55 · staff held inside' },
+    { id: 'hormuz', title: 'The Hormuz Deadline', place: 'Strait of Hormuz · 04:10 local', line: 'Iran has shut the strait again. The ceasefire has forty days left.' },
+    { id: 'taiwan', title: 'Invasion of Taiwan', place: 'Taiwan Strait · 05:40 local', line: 'China’s fleet left port an hour ago. It isn’t an exercise.' },
+    { id: 'warhead', title: 'Loose Warhead', place: 'Islamabad · 02:15 local', line: 'A coup in Islamabad, and a warhead isn’t where it should be.' },
+    { id: 'berlin', title: 'Agent in Jeopardy', place: 'Berlin · 23:30 local', line: 'A CIA officer burned in Berlin, holding proof she shouldn’t have.' },
   ];
 
   const DEADLINE = 90;   // seconds; the number Mike names
@@ -68,6 +70,12 @@
     };
   })();
 
+  // The app's own sounds (Marshall): the call-connected sound as the pick-up, and a click when the line closes.
+  const sounds = { pickup: '/attached_assets/mike/establishedSound.m4a', out: '/attached_assets/mike/comms-click-out.wav' };
+  function play(name) {
+    try { const a = new Audio(sounds[name]); a.volume = 0.7; const p = a.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+  }
+
   /* ---------- small helpers ---------- */
   const mmss = (s) => String(Math.floor(s / 60)) + ':' + String(s % 60).padStart(2, '0');
   const say = (text) => { status.textContent = text || ''; };
@@ -85,7 +93,8 @@
   function choose(i) {
     chosen = i;
     [...list.children].forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
-    situation.textContent = SCENARIOS[i].title + ' · ' + SCENARIOS[i].line;
+    situation.textContent = SCENARIOS[i].place;
+    teaser.textContent = SCENARIOS[i].line;
   }
 
   function setState(state, message) {
@@ -99,7 +108,8 @@
     note.hidden = active || state === 'ended';
     [...list.children].forEach((b) => { b.disabled = active; });
     words.hidden = state !== 'connected' && !(state === 'ended' && transcript.childElementCount);
-    if (state !== 'connected') clock.hidden = true;
+    if (state !== 'connected') { clock.hidden = true; choiceLine.hidden = true; }
+    teaser.hidden = active || state === 'ended';
     if (active) hangup.focus({ preventScroll: true });
   }
 
@@ -118,14 +128,16 @@
         clockLabel.textContent = 'Time’s up';
         say('Time’s up.');
         // Tell Mike, so he presses for an answer. A deadline that passed with nothing happening would break the spell.
-        try { if (conversation && conversation.sendContextualUpdate) conversation.sendContextualUpdate('The ninety seconds are up and the President has not decided. Press for a decision now, in one line.'); } catch (e) {}
+        try { if (conversation && conversation.sendContextualUpdate) conversation.sendContextualUpdate('The ninety seconds are up.'); } catch (e) {}
       }
     }, 250);
   }
 
-  function decisionMade() {
+  function decisionMade(choice) {
     if (decided) return;
     decided = true;
+    const said = String(choice || '').trim().slice(0, 90);
+    choiceLine.textContent = said; choiceLine.hidden = !said;
     clearTimeout(clockStartTimer); clearInterval(clockTimer); clockTimer = null;
     clock.hidden = false; clock.dataset.done = 'true';
     clockLabel.textContent = 'Decision made';
@@ -184,6 +196,7 @@
 
   function finish(state, message) {
     const wasConnected = root.dataset.state === 'connected';
+    if (wasConnected) play('out');
     cleanup();
     setState(state, message);
     if (state === 'ended' && wasConnected) showAfter();
@@ -215,10 +228,11 @@
     const token = ++generation;
     ring.stop();
     decided = false; headline = ''; heardMike = false;
-    transcript.replaceChildren(); clock.hidden = true; after.hidden = true; paper.hidden = true;
+    transcript.replaceChildren(); clock.hidden = true; choiceLine.hidden = true; choiceLine.textContent = ''; after.hidden = true; paper.hidden = true;
     controller = new AbortController();
     document.querySelectorAll('video,audio').forEach((m) => m.pause());
     setState('asking');
+    play('pickup'); // the press is what lets a browser play it
     if (SIM) { simulate(token); return; }
     try {
       const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -240,7 +254,7 @@
         signedUrl,
         dynamicVariables: { crisis_id: SCENARIOS[chosen].id },
         clientTools: {
-          decision_made: () => { if (token === generation) decisionMade(); return 'ok'; },
+          decision_made: (p) => { if (token === generation) decisionMade(p && p.choice); return 'ok'; },
           show_headline: (p) => { if (token === generation) printHeadline(p && p.headline); return 'shown'; },
         },
         preferHeadphonesForIosDevices: true,
@@ -272,8 +286,8 @@
     at(0.5, () => setState('connecting'));
     at(1.5, () => onConnected(token));
     at(2, () => onMikeSpoke(token, 'Boss, it’s Mike. Sorry, there’s no good time for this. We’ve got a situation, and I need your decision in the next ninety seconds.'));
-    at(40, () => { decisionMade(); onMikeSpoke(token, 'A phone call. All right. I’ll tell Tanaka to stand his ships down. He won’t thank you.'); });
-    at(55, () => { printHeadline('President Blinks in Strait Standoff'); onMikeSpoke(token, 'Tomorrow’s Potomac Dispatch: “President Blinks in Strait Standoff.”'); });
+    at(40, () => { decisionMade('A phone call to their ambassador'); onMikeSpoke(token, 'A phone call. All right. I’ll tell Tanaka to stand his ships down. He won’t thank you.'); });
+    at(55, () => { printHeadline('President Blinks in Hormuz Standoff'); onMikeSpoke(token, 'Tomorrow’s Potomac Dispatch: “President Blinks in Hormuz Standoff.”'); });
     at(70, () => finish('ended'));
   }
 

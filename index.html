@@ -1090,7 +1090,7 @@
 
         /* Mike's call (local build, 2026-11-25) */
         .mike-call {
-            max-width: 560px;
+            max-width: 680px;
             margin: 24px auto 0;
             scroll-margin-top: 40px;
         }
@@ -1133,6 +1133,12 @@
         }
 
         .mc-scenario:disabled { opacity: 0.45; cursor: default; }
+
+        .mc-card, .mc-after {
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
         .mc-card {
             background: rgba(13, 17, 23, 0.82);
@@ -1186,6 +1192,20 @@
             letter-spacing: 1px;
             margin-top: 22px;
             min-height: 1.6em;
+        }
+
+        .mc-teaser {
+            font-family: var(--font-hero);
+            font-size: 24px;
+            line-height: 1.3;
+            margin-top: 10px;
+            text-wrap: balance;
+        }
+
+        .mc-choice {
+            font-family: var(--font-hero);
+            font-size: 22px;
+            margin-top: 10px;
         }
 
         .mc-clock {
@@ -1470,7 +1490,9 @@
                         <p class="mc-who">Mike Brannigan</p>
                         <p class="mc-role">Chief of Staff</p>
                         <p class="mc-situation" id="mcSituation"></p>
+                        <p class="mc-teaser" id="mcTeaser"></p>
                         <p class="mc-clock" id="mcClock" aria-hidden="true" hidden><span class="mc-clock-label" id="mcClockLabel">Decision in</span><span class="mc-clock-time" id="mcClockTime">1:30</span></p>
+                        <p class="mc-choice" id="mcChoice" hidden></p>
                         <p class="mc-status" id="mcStatus" role="status"></p>
                         <div class="mc-actions">
                             <button type="button" class="cta-button" id="mcAnswer">Answer</button>
@@ -2022,6 +2044,6 @@
             }, { passive: true });
         })();
     </script>
-    <script src="/js/mike-call.js?v=local-2" defer></script>
+    <script src="/js/mike-call.js?v=local-4" defer></script>
 </body>
 </html>
